@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.2  
-状态：一期基线已锁定（Step 1 已通过，Step 2 已落地待验证）  
+版本：V1.3  
+状态：一期基线已锁定（Step 1-3 已完成，Step 4 待用户验证后启动）  
 更新日期：2026-03-18
 
 ## 1. 范围与边界
@@ -201,26 +201,26 @@
 - 一期性能目标：功能可用与基础可观测，不强制 99.9% SLA 和 100 并发压测。
 
 ## 11. 开发约束同步
-- AI 开发前必读文档：`AI_售电_产品设计文档.md` 与本文件。
+- AI 开发前必读文档：`docs/memory-bank/AI_售电_产品设计文档.md` 与 `docs/memory-bank/architecture.md`。
 - 每完成重大里程碑必须更新本文件（数据模型、接口边界、部署策略至少一项）。
 
 ## 12. memory-bank 文档职责映射（新增）
-- `AI_售电_产品设计文档.md`
+- `docs/memory-bank/AI_售电_产品设计文档.md`
   - 作用：产品原始需求与业务目标来源，定义全量业务蓝图（含一期与后续扩展）。
   - 使用方式：用于确认“做什么”，是范围判断的上游依据。
-- `tech-stack.md`
+- `docs/memory-bank/tech-stack.md`
   - 作用：技术选型基线，约束前后端、数据层、AI 中台与部署方式。
   - 使用方式：用于确认“用什么做”，避免技术栈漂移。
-- `IMPLEMENTATION_PLAN.md`
+- `docs/memory-bank/IMPLEMENTATION_PLAN.md`
   - 作用：分步实施路线图与每步验证标准，定义执行顺序与门禁。
   - 使用方式：用于确认“先做什么、如何验收”，开发按步骤推进。
-- `MVP_验收清单.md`
+- `docs/memory-bank/MVP_验收清单.md`
   - 作用：实施计划 Step 1 的交付物，沉淀一期 MVP 的字段、接口、页面、指标、角色验收口径。
   - 使用方式：作为后续步骤的共同验收基线；若超出清单即视为范围变更。
-- `progress.md`
+- `docs/memory-bank/progress.md`
   - 作用：开发日志与里程碑记录，面向后续开发者快速了解“已经做了什么、当前卡点是什么”。
   - 使用方式：每完成一个阶段或关键决策后更新，记录产出文件与验收状态。
-- `architecture.md`（本文件）
+- `docs/memory-bank/architecture.md`（本文件）
   - 作用：系统架构与核心数据模型的当前事实来源，承接每个里程碑后的结构性沉淀。
   - 使用方式：当实现引入新模块、边界变化或数据结构调整时，必须同步更新。
 
@@ -232,9 +232,15 @@
   - Redis：7（`7-alpine`）
   - Dify：0.15.x（默认 `0.15.3`）
 - 运行方式：
-  - `docker-compose.step2.yml` 负责 PostgreSQL + Redis。
-  - Dify 使用仓库内 `.dify/docker/docker-compose.yaml` 官方编排启动。
+  - `infra/docker-compose.step2.yml` 负责 PostgreSQL + Redis。
+  - Dify 使用仓库内 `infra/dify/docker/docker-compose.yaml` 官方编排启动。
 - 验证口径（Step 2）：
   - 仅验证基础服务健康检查（PostgreSQL、Redis、Dify），不包含业务接口联调。
 - 执行边界：
-  - 在用户完成 Step 2 验证前，不启动 Step 3（项目结构统一）。
+  - Step 3（项目结构统一）已完成；在用户完成 Step 3 验证前，不启动 Step 4（核心数据模型设计）。
+
+## 14. Step 3 目录基线（新增）
+- `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
+- `backend/`：后端工程目录（后续步骤落地 FastAPI 模块化服务）。
+- `docs/`：文档目录，memory-bank 位于 `docs/memory-bank/`。
+- `infra/`：基础设施目录，包含 Step 2 编排文件与 Dify 仓库副本。
