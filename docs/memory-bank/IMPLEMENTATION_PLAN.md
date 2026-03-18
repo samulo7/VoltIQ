@@ -1,11 +1,11 @@
 ﻿# 实施计划（面向 AI 开发者）
 
-版本：V1.5  
-状态：Step 1-5 已完成（Step 5 待用户测试验证）；Step 6 未启动  
+版本：V1.6  
+状态：Step 1-6 已完成工程实现（Step 6 待用户测试验证）；Step 7 未启动  
 更新日期：2026-03-18
 
 本计划基于 `docs/memory-bank/tech-stack.md` 与 `docs/memory-bank/AI_售电_产品设计文档.md`，并吸收了产品负责人在 2026-03-18 的澄清结论。先交付基础功能，完整功能在“扩展阶段”追加。
-执行门禁（2026-03-18）：Step 5 已完成工程实现，待用户测试验证；在用户确认前不启动 Step 6。
+执行门禁（2026-03-18）：Step 6 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 7。
 
 
 ## 一期范围（锁定）
@@ -66,9 +66,13 @@
 - 当前产出：`backend/` 已新增 SQLAlchemy + Alembic 基线与初始迁移 `20260318_0001_step5_initial_schema.py`。
 - 本地验证：已执行 `upgrade head -> downgrade base -> upgrade head`，结果通过。
 
-### 6. 建立基础权限模型
+### 6. 建立基础权限模型（已完成，待用户验证）
 - 指令：定义三角色访问范围，落地接口级 RBAC 与菜单级权限。
 - 验证：接口可区分角色读写，菜单可按角色显示。
+- 当前产出：
+  - 已新增 `backend/app/rbac/` 策略层（与框架解耦），包含权限码、角色权限映射、接口策略注册表、菜单策略注册表。
+  - 已落地 `sales` owner 强约束与 `manager` 审批权限（`opportunity.rollback`、`deal.correct`）。
+  - 已新增 `backend/tests/test_rbac_policy.py`，本地 `pytest -q` 通过（7 passed）。
 
 ### 7. 后端基础框架搭建
 - 指令：初始化 FastAPI 项目，划分模块（`auth`、`leads`、`crm`、`content`、`kb`、`metrics`、`audit`）。

@@ -15,6 +15,10 @@
   - 在 `backend/` 初始化 `SQLAlchemy + Alembic` 基线与数据库配置。
   - 新增基线迁移 `20260318_0001_step5_initial_schema.py`，落地 MVP 核心表、约束与索引。
   - 本地完成迁移链路验证：`upgrade head -> downgrade base -> upgrade head`。
+- 已按用户指令实施计划 Step 6（基础权限模型）：
+  - 新增框架无关 RBAC 策略层 `backend/app/rbac/`（权限码、角色映射、接口/菜单策略注册表）。
+  - 落地 `sales` owner 强约束（fail-closed）与 `manager` 审批权限（`opportunity.rollback`、`deal.correct`）。
+  - 新增权限单测 `backend/tests/test_rbac_policy.py`，本地执行 `python -m pytest -q` 通过（7 passed）。
 
 ### 产出文件
 - `docs/memory-bank/MVP_验收清单.md`：Step 1 的正式验收基线与评审记录载体。
@@ -28,6 +32,11 @@
 - `backend/app/core/*`、`backend/app/db/*`：数据库配置、模型基类、枚举与核心模型定义。
 - `backend/alembic/env.py`、`backend/alembic/script.py.mako`、`backend/alembic/versions/20260318_0001_step5_initial_schema.py`：迁移运行环境与基线迁移脚本。
 - `docs/memory-bank/architecture.md`：更新至 V1.6，同步 Step 5 落地与执行门禁。
+- `backend/app/rbac/types.py`、`backend/app/rbac/policy.py`、`backend/app/rbac/__init__.py`：Step 6 权限模型策略层与注册表。
+- `backend/tests/test_rbac_policy.py`：Step 6 RBAC 单元测试。
+- `backend/pyproject.toml`：新增 `pytest` 开发依赖与测试路径配置。
+- `docs/memory-bank/architecture.md`：更新至 V1.7，同步 Step 6 策略层基线与 Step 7 门禁。
+- `docs/memory-bank/IMPLEMENTATION_PLAN.md`：更新至 V1.6，同步 Step 6 状态与验证门禁。
 
 ### 验收状态
 - 产品负责人已确认 Step 1 通过（确认日期：2026-03-18）。
@@ -35,9 +44,11 @@
 - Step 3 已完成实施并通过用户验证（确认日期：2026-03-18）。
 - Step 4 已通过用户验证（确认日期：2026-03-18）。
 - Step 5 已完成工程实现；迁移链路已通过本地验证，待用户测试确认（记录日期：2026-03-18）。
+- Step 6 已完成工程实现；权限单测已通过本地验证，待用户测试确认（记录日期：2026-03-18）。
 
 ### 执行约束记录
 - Step 3 门禁已解除，Step 4 已实施完成。
 - Step 4 验证已完成，Step 5 已按用户明确指令启动并完成实现。
-- 在用户完成 Step 5 测试验证前，不启动 Step 6（基础权限模型）。
+- Step 6 已按用户明确指令启动并完成工程实现。
+- 在用户完成 Step 6 测试验证前，不启动 Step 7（后端基础框架搭建）。
 - 按分工约定，测试由用户侧执行，当前记录不包含测试执行结果。

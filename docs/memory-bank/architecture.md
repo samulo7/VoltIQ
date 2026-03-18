@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.6  
-状态：一期基线已锁定（Step 1-5 已完成，Step 5 待用户测试验证；Step 6 未启动）  
+版本：V1.7  
+状态：一期基线已锁定（Step 1-6 已完成工程实现；Step 6 待用户测试验证；Step 7 未启动）  
 更新日期：2026-03-18
 
 ## 1. 范围与边界
@@ -187,6 +187,7 @@
   - `sales`（销售）
   - `manager`（管理层）
 - 一期控制粒度：接口级 + 菜单级。
+- Step 6 落地形态：先落地框架无关的策略层（可测试），后续在 Step 7/15 接入后端路由与前端菜单渲染。
 
 ### 7.1 权限矩阵（一期）
 - 运营：
@@ -200,6 +201,22 @@
 - 管理层：
   - 全量只读 + 关键审批操作（阶段回退、成单校正）。
   - 可查看全量看板与审计日志。
+
+### 7.2 Step 6 策略层约束（已落地）
+- 权限编码：
+  - 使用 `PermissionCode` 统一描述接口与菜单权限点（如 `lead.read`、`deal.create`、`audit_log.read`、`opportunity.rollback`、`deal.correct`）。
+- 角色权限映射：
+  - `operator`：线索读写/分配/合并、内容任务读写、客服会话查看。
+  - `sales`：本人线索/跟进/商机读写、成单创建与查看、基础看板查看。
+  - `manager`：全量读权限 + `opportunity.rollback`、`deal.correct` 两个审批权限。
+- 所有权约束（sales）：
+  - 对 `lead`、`follow_up`、`opportunity`、`deal` 相关权限强制 owner 校验。
+  - owner 校验采用 fail-closed：缺少 owner 上下文默认拒绝。
+- 注册表契约：
+  - `ENDPOINT_POLICY_REGISTRY`：`<module>.<action>` -> 权限码 + `sales` 所有权策略。
+  - `MENU_POLICY_REGISTRY`：菜单 key -> 访问所需权限码。
+- 测试口径：
+  - 覆盖角色矩阵、sales owner 约束、manager 审批特权、注册表完整性与菜单可见性。
 
 ## 8. 鉴权与安全
 - 登录方式：账号密码。
@@ -263,8 +280,9 @@
 - 验证口径（Step 2）：
   - 仅验证基础服务健康检查（PostgreSQL、Redis、Dify），不包含业务接口联调。
 - 执行边界：
-  - Step 5（数据库与迁移流程）已完成工程落地，待用户测试验证。
-  - 在用户完成 Step 5 验证前，不启动 Step 6（基础权限模型）。
+  - Step 5（数据库与迁移流程）已完成工程落地。
+  - Step 6（基础权限模型）已在用户明确指令后启动并完成工程实现，待用户测试验证。
+  - 在用户完成 Step 6 验证前，不启动 Step 7（后端基础框架搭建）。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
@@ -283,3 +301,16 @@
   - 落地 `kb_messages` 来源约束：`role=assistant` 时 `source_refs` 必须非空。
 - UUID 策略：
   - 主键采用应用层 `uuid4` 生成，不依赖 PostgreSQL 扩展函数。
+
+## 16. Step 6 基础权限模型基线（新增）
+- 落地目录：
+  - `backend/app/rbac/`（`types.py`、`policy.py`、`__init__.py`）。
+- 核心接口：
+  - `AccessRequest` + `is_allowed()`：统一权限判定入口。
+  - `EndpointAccessRequest` + `authorize_endpoint()`：接口动作授权入口。
+  - `can_view_menu()`：菜单可见性授权入口。
+- 关键策略：
+  - `sales` 的 owner 约束在策略层强制执行。
+  - `manager` 仅保留只读 + `opportunity.rollback`、`deal.correct` 审批特权。
+- 测试基线：
+  - `backend/tests/test_rbac_policy.py`，本地 `pytest` 通过（7 passed）。
