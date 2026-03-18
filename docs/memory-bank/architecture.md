@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.5  
-状态：一期基线已锁定（Step 1-4 已完成并通过用户验证；Step 5 未启动）  
+版本：V1.6  
+状态：一期基线已锁定（Step 1-5 已完成，Step 5 待用户测试验证；Step 6 未启动）  
 更新日期：2026-03-18
 
 ## 1. 范围与边界
@@ -263,10 +263,23 @@
 - 验证口径（Step 2）：
   - 仅验证基础服务健康检查（PostgreSQL、Redis、Dify），不包含业务接口联调。
 - 执行边界：
-  - Step 4（核心数据模型设计）已通过用户验证；Step 5（数据库与迁移流程）仅在用户明确指令后启动。
+  - Step 5（数据库与迁移流程）已完成工程落地，待用户测试验证。
+  - 在用户完成 Step 5 验证前，不启动 Step 6（基础权限模型）。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
 - `backend/`：后端工程目录（后续步骤落地 FastAPI 模块化服务）。
 - `docs/`：文档目录，memory-bank 位于 `docs/memory-bank/`。
 - `infra/`：基础设施目录，包含 Step 2 编排文件与 Dify 仓库副本。
+
+## 15. Step 5 数据库与迁移基线（新增）
+- 迁移工具：
+  - `SQLAlchemy 2.x + Alembic`（位于 `backend/`）。
+- 迁移版本：
+  - 基线迁移：`20260318_0001_step5_initial_schema.py`。
+- 落地范围：
+  - 创建一期核心表：`users`、`leads`、`lead_merge_logs`、`customers`、`follow_ups`、`opportunities`、`deals`、`content_tasks`、`kb_sessions`、`kb_messages`、`audit_logs`。
+  - 创建关键唯一约束与索引（含线索去重唯一索引 `leads.phone`）。
+  - 落地 `kb_messages` 来源约束：`role=assistant` 时 `source_refs` 必须非空。
+- UUID 策略：
+  - 主键采用应用层 `uuid4` 生成，不依赖 PostgreSQL 扩展函数。

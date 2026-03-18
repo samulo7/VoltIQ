@@ -14,5 +14,5 @@ AI + 售电 MVP 项目仓库。
 3. 启动 Dify：`docker compose -f infra/dify/docker/docker-compose.yaml up -d`
 
 ## 说明
-- 当前已完成 Step 3（目录统一）。
-- 根据执行门禁：在用户完成 Step 3 验证前，不启动 Step 4。
+- 当前已完成 Step 1-5（Step 5 待用户测试验证）。
+- 根据执行门禁：在用户完成 Step 5 验证前，不启动 Step 6。
