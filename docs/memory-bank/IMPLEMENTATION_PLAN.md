@@ -1,11 +1,11 @@
 ﻿# 实施计划（面向 AI 开发者）
 
-版本：V1.8  
-状态：Step 1-8 已完成工程实现（Step 8 待用户测试验证）；Step 9 未启动  
+版本：V1.9  
+状态：Step 1-9 已完成工程实现（Step 9 待用户测试验证）；Step 10 未启动  
 更新日期：2026-03-18
 
 本计划基于 `docs/memory-bank/tech-stack.md` 与 `docs/memory-bank/AI_售电_产品设计文档.md`，并吸收了产品负责人在 2026-03-18 的澄清结论。先交付基础功能，完整功能在“扩展阶段”追加。
-执行门禁（2026-03-18）：Step 8 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 9。
+执行门禁（2026-03-18）：Step 9 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 10。
 
 
 ## 一期范围（锁定）
@@ -93,9 +93,16 @@
   - 已新增 `backend/tests/test_leads_api.py`，覆盖去重、筛选、分配、更新、RBAC 与审计/合并日志落库断言。
   - 本地验证：`python -m pytest -q` 通过（16 passed）。
 
-### 9. CRM 跟进记录接口
+### 9. CRM 跟进记录接口（已完成，待用户验证）
 - 指令：实现跟进记录增删改查，关联线索/客户。
 - 验证：新增跟进后，线索最近跟进时间与负责人正确更新。
+- 当前产出：
+  - 已在 `backend/app/modules/crm/` 新增 `deps.py`、`schemas.py`、`repository.py`、`service.py`，并扩展 `router.py`，完成 Step 9 接口分层落地。
+  - 已实现 `POST /api/v1/crm/follow-ups`、`GET /api/v1/crm/follow-ups`、`GET /api/v1/crm/follow-ups/{follow_up_id}`、`PATCH /api/v1/crm/follow-ups/{follow_up_id}`、`DELETE /api/v1/crm/follow-ups/{follow_up_id}`。
+  - 已接入 Header 模拟鉴权（`X-Actor-Role`、`X-Actor-User-Id`）并复用 Step 6 RBAC 策略层，落地 `sales` owner 约束与 `manager` 只读。
+  - 已落地 `follow_up.created`、`follow_up.updated`、`follow_up.deleted` 审计记录，并实现 `leads.latest_follow_up_at` 新增更新/删除重算。
+  - 已新增 `backend/tests/test_crm_follow_ups_api.py`，覆盖 CRUD、RBAC、客户归属校验、审计落库与 `latest_follow_up_at` 更新规则。
+  - 本地验证：`python -m pytest -q` 通过（22 passed，含 Step 6/7/8/9 回归）。
 
 ### 10. 商机与成单接口
 - 指令：实现商机阶段流转、成单记录与简要统计。

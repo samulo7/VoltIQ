@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.9  
-状态：一期基线已锁定（Step 1-8 已完成工程实现；Step 8 待用户测试验证；Step 9 未启动）  
+版本：V1.10  
+状态：一期基线已锁定（Step 1-9 已完成工程实现；Step 9 待用户测试验证；Step 10 未启动）  
 更新日期：2026-03-18
 
 ## 1. 范围与边界
@@ -284,8 +284,9 @@
   - Step 5（数据库与迁移流程）已完成工程落地。
   - Step 6（基础权限模型）已完成工程实现并通过本地单测。
   - Step 7（后端基础框架搭建）已按用户指令完成工程实现。
-  - Step 8（线索管理接口）已按用户指令完成工程实现，待用户测试验证。
-  - 在用户完成 Step 8 验证前，不启动 Step 9（CRM 跟进记录接口）。
+  - Step 8（线索管理接口）已按用户指令完成工程实现并通过本地回归测试。
+  - Step 9（CRM 跟进记录接口）已按用户指令完成工程实现，待用户测试验证。
+  - 在用户完成 Step 9 验证前，不启动 Step 10（商机与成单接口）。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
@@ -347,3 +348,24 @@
 - 测试基线：
   - 新增 `backend/tests/test_leads_api.py`，覆盖去重、筛选、分配、更新、RBAC 与审计/合并日志落库。
   - 本地 `python -m pytest -q` 通过（16 passed，含 Step 6/7 回归）。
+
+## 19. Step 9 CRM 跟进记录接口基线（新增）
+- 落地目录：
+  - `backend/app/modules/crm/`（`router.py`、`deps.py`、`schemas.py`、`repository.py`、`service.py`）。
+- 接口基线：
+  - `POST /api/v1/crm/follow-ups`：新增跟进，支持关联 `lead_id` 与可选 `customer_id`。
+  - `GET /api/v1/crm/follow-ups`：支持 `lead_id`、`customer_id`、`created_by`、`created_at` 时间范围筛选与分页。
+  - `GET /api/v1/crm/follow-ups/{follow_up_id}`、`PATCH /api/v1/crm/follow-ups/{follow_up_id}`、`DELETE /api/v1/crm/follow-ups/{follow_up_id}`。
+- 业务规则与约束：
+  - 新增跟进后同步更新 `leads.latest_follow_up_at`。
+  - 删除跟进后按剩余记录重算 `leads.latest_follow_up_at`（无记录则置空）。
+  - 传入 `customer_id` 时必须存在，且必须归属同一 `lead_id`。
+- 权限与约束：
+  - 接口授权复用 Step 6 RBAC 策略层与现有 `crm.follow_ups.*` endpoint key。
+  - `sales` 按 owner 强约束，仅可操作本人负责线索的跟进记录。
+  - `manager` 保持只读（可查不可写）。
+- 审计基线：
+  - 已落地 `follow_up.created`、`follow_up.updated`、`follow_up.deleted` 审计写入。
+- 测试基线：
+  - 新增 `backend/tests/test_crm_follow_ups_api.py`，覆盖创建/查询/更新/删除、owner 权限、客户归属校验、`latest_follow_up_at` 更新与重算、审计落库断言。
+  - 本地 `python -m pytest -q` 通过（22 passed，含 Step 6/7/8 回归）。

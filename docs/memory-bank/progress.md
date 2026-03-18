@@ -29,6 +29,13 @@
   - 已接入 Header 模拟鉴权（`X-Actor-Role`、`X-Actor-User-Id`）并复用 Step 6 RBAC 策略层，落地 `sales` owner 约束与 `manager` 写入拒绝。
   - 已落地 `lead.created`、`lead.updated`、`lead.assign`、`lead.merged` 审计记录，且手机号按脱敏规则写入日志。
   - 新增接口测试 `backend/tests/test_leads_api.py`；本地执行 `python -m pytest -q` 通过（16 passed，含 Step 6/7 回归）。
+- 已按用户指令实施计划 Step 9（CRM 跟进记录接口）：
+  - 在 `backend/app/modules/crm/` 新增 `deps.py`、`schemas.py`、`repository.py`、`service.py`，并扩展 `router.py`，完成模块化分层。
+  - 已实现 `POST /api/v1/crm/follow-ups`、`GET /api/v1/crm/follow-ups`、`GET /api/v1/crm/follow-ups/{follow_up_id}`、`PATCH /api/v1/crm/follow-ups/{follow_up_id}`、`DELETE /api/v1/crm/follow-ups/{follow_up_id}`。
+  - 已接入 Header 模拟鉴权并复用 Step 6 RBAC 策略层，落地 `sales` owner 约束与 `manager` 只读。
+  - 已实现新增跟进更新 `leads.latest_follow_up_at`，删除跟进后重算并回写该字段。
+  - 已落地 `follow_up.created`、`follow_up.updated`、`follow_up.deleted` 审计记录。
+  - 新增接口测试 `backend/tests/test_crm_follow_ups_api.py`；本地执行 `python -m pytest -q` 通过（22 passed，含 Step 6/7/8 回归）。
 
 ### 产出文件
 - `docs/memory-bank/MVP_验收清单.md`：Step 1 的正式验收基线与评审记录载体。
@@ -58,6 +65,11 @@
 - `backend/app/main.py`：版本标识更新至 `0.1.0-step8`。
 - `docs/memory-bank/architecture.md`：更新至 V1.9，同步 Step 8 接口基线与 Step 9 门禁。
 - `docs/memory-bank/IMPLEMENTATION_PLAN.md`：更新至 V1.8，同步 Step 8 状态、产出与验证门禁。
+- `backend/app/modules/crm/router.py`、`backend/app/modules/crm/deps.py`、`backend/app/modules/crm/schemas.py`、`backend/app/modules/crm/repository.py`、`backend/app/modules/crm/service.py`：Step 9 CRM 跟进记录接口与分层实现。
+- `backend/tests/test_crm_follow_ups_api.py`：Step 9 接口集成测试（CRUD/RBAC/客户归属/最近跟进时间/审计落库）。
+- `backend/app/main.py`：版本标识更新至 `0.1.0-step9`。
+- `docs/memory-bank/architecture.md`：更新至 V1.10，同步 Step 9 接口基线与 Step 10 门禁。
+- `docs/memory-bank/IMPLEMENTATION_PLAN.md`：更新至 V1.9，同步 Step 9 状态、产出与验证门禁。
 
 ### 验收状态
 - 产品负责人已确认 Step 1 通过（确认日期：2026-03-18）。
@@ -68,6 +80,7 @@
 - Step 6 已完成工程实现；权限单测已通过本地验证，待用户测试确认（记录日期：2026-03-18）。
 - Step 7 已完成工程实现；基础路由与健康检查已通过本地测试，待用户测试确认（记录日期：2026-03-18）。
 - Step 8 已完成工程实现；线索接口与去重/分配流程已通过本地测试，待用户测试确认（记录日期：2026-03-18）。
+- Step 9 已完成工程实现；CRM 跟进接口与最近跟进时间回写规则已通过本地测试，待用户测试确认（记录日期：2026-03-18）。
 
 ### 执行约束记录
 - Step 3 门禁已解除，Step 4 已实施完成。
@@ -75,5 +88,6 @@
 - Step 6 已按用户明确指令启动并完成工程实现。
 - Step 7 已按用户明确指令启动并完成工程实现。
 - Step 8 已按用户明确指令启动并完成工程实现。
-- 在用户完成 Step 8 测试验证前，不启动 Step 9（CRM 跟进记录接口）。
+- Step 9 已按用户明确指令启动并完成工程实现。
+- 在用户完成 Step 9 测试验证前，不启动 Step 10（商机与成单接口）。
 - 按分工约定，测试由用户侧执行，当前记录不包含测试执行结果。
