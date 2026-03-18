@@ -1,11 +1,11 @@
 ﻿# 实施计划（面向 AI 开发者）
 
-版本：V1.6  
-状态：Step 1-6 已完成工程实现（Step 6 待用户测试验证）；Step 7 未启动  
+版本：V1.7  
+状态：Step 1-7 已完成工程实现（Step 7 待用户测试验证）；Step 8 未启动  
 更新日期：2026-03-18
 
 本计划基于 `docs/memory-bank/tech-stack.md` 与 `docs/memory-bank/AI_售电_产品设计文档.md`，并吸收了产品负责人在 2026-03-18 的澄清结论。先交付基础功能，完整功能在“扩展阶段”追加。
-执行门禁（2026-03-18）：Step 6 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 7。
+执行门禁（2026-03-18）：Step 7 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 8。
 
 
 ## 一期范围（锁定）
@@ -74,9 +74,14 @@
   - 已落地 `sales` owner 强约束与 `manager` 审批权限（`opportunity.rollback`、`deal.correct`）。
   - 已新增 `backend/tests/test_rbac_policy.py`，本地 `pytest -q` 通过（7 passed）。
 
-### 7. 后端基础框架搭建
+### 7. 后端基础框架搭建（已完成，待用户验证）
 - 指令：初始化 FastAPI 项目，划分模块（`auth`、`leads`、`crm`、`content`、`kb`、`metrics`、`audit`）。
 - 验证：基础路由可访问，健康检查成功。
+- 当前产出：
+  - 已新增 FastAPI 应用入口 `backend/app/main.py` 与 API 聚合路由 `backend/app/api/router.py`。
+  - 已新增七大模块路由骨架（`backend/app/modules/*/router.py`）并统一挂载到 `/api/v1`。
+  - 已新增全局 `/healthz` 与模块 `/api/v1/<module>/health` 健康检查接口。
+  - 已新增 `backend/tests/test_api_health.py`，本地 `python -m pytest -q` 通过（9 passed）。
 
 ### 8. 线索管理接口（新增/查询/更新）
 - 指令：实现线索创建、列表筛选、状态更新、分配与去重合并。

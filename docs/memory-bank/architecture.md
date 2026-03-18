@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.7  
-状态：一期基线已锁定（Step 1-6 已完成工程实现；Step 6 待用户测试验证；Step 7 未启动）  
+版本：V1.8  
+状态：一期基线已锁定（Step 1-7 已完成工程实现；Step 7 待用户测试验证；Step 8 未启动）  
 更新日期：2026-03-18
 
 ## 1. 范围与边界
@@ -187,7 +187,7 @@
   - `sales`（销售）
   - `manager`（管理层）
 - 一期控制粒度：接口级 + 菜单级。
-- Step 6 落地形态：先落地框架无关的策略层（可测试），后续在 Step 7/15 接入后端路由与前端菜单渲染。
+- Step 6 落地形态：先落地框架无关的策略层（可测试）；Step 7 已完成后端路由骨架接入，后续在 Step 15 接入前端菜单渲染。
 
 ### 7.1 权限矩阵（一期）
 - 运营：
@@ -281,8 +281,9 @@
   - 仅验证基础服务健康检查（PostgreSQL、Redis、Dify），不包含业务接口联调。
 - 执行边界：
   - Step 5（数据库与迁移流程）已完成工程落地。
-  - Step 6（基础权限模型）已在用户明确指令后启动并完成工程实现，待用户测试验证。
-  - 在用户完成 Step 6 验证前，不启动 Step 7（后端基础框架搭建）。
+  - Step 6（基础权限模型）已完成工程实现并通过本地单测。
+  - Step 7（后端基础框架搭建）已按用户指令完成工程实现，待用户测试验证。
+  - 在用户完成 Step 7 验证前，不启动 Step 8（线索管理接口）。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
@@ -314,3 +315,16 @@
   - `manager` 仅保留只读 + `opportunity.rollback`、`deal.correct` 审批特权。
 - 测试基线：
   - `backend/tests/test_rbac_policy.py`，本地 `pytest` 通过（7 passed）。
+
+## 17. Step 7 后端基础框架基线（新增）
+- 落地目录：
+  - `backend/app/main.py`、`backend/app/api/`、`backend/app/modules/`。
+- 模块骨架：
+  - 已创建 `auth`、`leads`、`crm`、`content`、`kb`、`metrics`、`audit` 七个模块路由骨架。
+  - 统一挂载到 `/api/v1/*` 前缀下。
+- 健康检查：
+  - 全局健康检查：`/healthz`。
+  - 模块健康检查：`/api/v1/<module>/health`。
+- 测试基线：
+  - `backend/tests/test_api_health.py` 覆盖全局与模块健康检查、OpenAPI 可访问性。
+  - 本地 `python -m pytest -q` 通过（9 passed，包含 Step 6 回归测试）。
