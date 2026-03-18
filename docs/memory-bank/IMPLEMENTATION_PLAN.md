@@ -1,11 +1,11 @@
 ﻿# 实施计划（面向 AI 开发者）
 
-版本：V1.7  
-状态：Step 1-7 已完成工程实现（Step 7 待用户测试验证）；Step 8 未启动  
+版本：V1.8  
+状态：Step 1-8 已完成工程实现（Step 8 待用户测试验证）；Step 9 未启动  
 更新日期：2026-03-18
 
 本计划基于 `docs/memory-bank/tech-stack.md` 与 `docs/memory-bank/AI_售电_产品设计文档.md`，并吸收了产品负责人在 2026-03-18 的澄清结论。先交付基础功能，完整功能在“扩展阶段”追加。
-执行门禁（2026-03-18）：Step 7 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 8。
+执行门禁（2026-03-18）：Step 8 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 9。
 
 
 ## 一期范围（锁定）
@@ -17,7 +17,7 @@
 - 线索去重规则：
   - 主规则：手机号唯一。
   - 次规则：`企业名称 + 联系人姓名` 完全一致判重。
-  - 命中去重时不新建线索，合并来源渠道并写审计记录。
+  - 命中去重时不新建线索，保留主记录 `source_channel` 不变，将来源载荷写入 `lead_merge_logs` 并记录审计。
 - 角色与权限：
   - 角色：运营、销售、管理层。
   - 粒度：接口级 RBAC + 页面级菜单控制。
@@ -86,6 +86,12 @@
 ### 8. 线索管理接口（新增/查询/更新）
 - 指令：实现线索创建、列表筛选、状态更新、分配与去重合并。
 - 验证：API 可完成线索全流程，去重命中行为正确落库。
+- 当前产出：
+  - 已在 `backend/app/modules/leads/` 新增 `router.py`、`deps.py`、`schemas.py`、`repository.py`、`service.py`，完成 Step 8 接口分层落地。
+  - 已实现 `POST /api/v1/leads`（创建+自动去重合并）、`GET /api/v1/leads`（筛选列表）、`GET /api/v1/leads/{lead_id}`、`PATCH /api/v1/leads/{lead_id}`、`POST /api/v1/leads/{lead_id}/assign`、`POST /api/v1/leads/{lead_id}/merge`。
+  - 已接入 Header 模拟鉴权（`X-Actor-Role`、`X-Actor-User-Id`）并调用 Step 6 RBAC 策略层进行接口授权与 `sales` owner 约束。
+  - 已新增 `backend/tests/test_leads_api.py`，覆盖去重、筛选、分配、更新、RBAC 与审计/合并日志落库断言。
+  - 本地验证：`python -m pytest -q` 通过（16 passed）。
 
 ### 9. CRM 跟进记录接口
 - 指令：实现跟进记录增删改查，关联线索/客户。

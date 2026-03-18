@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from app.api.router import api_router
 
 APP_NAME = "VoltIQ Backend"
-APP_VERSION = "0.1.0-step7"
+APP_VERSION = "0.1.0-step8"
 
 
 def create_app() -> FastAPI:
@@ -30,4 +30,3 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-

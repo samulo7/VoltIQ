@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.8  
-状态：一期基线已锁定（Step 1-7 已完成工程实现；Step 7 待用户测试验证；Step 8 未启动）  
+版本：V1.9  
+状态：一期基线已锁定（Step 1-8 已完成工程实现；Step 8 待用户测试验证；Step 9 未启动）  
 更新日期：2026-03-18
 
 ## 1. 范围与边界
@@ -177,7 +177,7 @@
 - 规则 2：`company_name + name` 完全一致时，判定为重复线索。
 - 重复处理：
   - 不新建 leads 主记录。
-  - 新来源信息写入 `lead_merge_logs`。
+  - 保留主记录 `source_channel` 不变，新来源信息写入 `lead_merge_logs`。
   - 写入 `merge_reason`，并保存来源载荷 `merged_payload`。
   - 记录审计日志 `lead.merged`。
 
@@ -221,6 +221,7 @@
 ## 8. 鉴权与安全
 - 登录方式：账号密码。
 - Token：JWT（access 2h，refresh 7d）。
+- Step 8 过渡鉴权：在 JWT 完整落地前，线索接口使用 Header 鉴权（`X-Actor-Role`、`X-Actor-User-Id`）并复用 RBAC 策略层。
 - 密码存储：`bcrypt/argon2` 哈希，禁止明文。
 - 日志脱敏：手机号、邮箱、身份证等敏感字段禁止明文落日志。
 - API 最小暴露：关闭未使用端点，生产环境禁用调试接口。
@@ -282,8 +283,9 @@
 - 执行边界：
   - Step 5（数据库与迁移流程）已完成工程落地。
   - Step 6（基础权限模型）已完成工程实现并通过本地单测。
-  - Step 7（后端基础框架搭建）已按用户指令完成工程实现，待用户测试验证。
-  - 在用户完成 Step 7 验证前，不启动 Step 8（线索管理接口）。
+  - Step 7（后端基础框架搭建）已按用户指令完成工程实现。
+  - Step 8（线索管理接口）已按用户指令完成工程实现，待用户测试验证。
+  - 在用户完成 Step 8 验证前，不启动 Step 9（CRM 跟进记录接口）。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
@@ -328,3 +330,20 @@
 - 测试基线：
   - `backend/tests/test_api_health.py` 覆盖全局与模块健康检查、OpenAPI 可访问性。
   - 本地 `python -m pytest -q` 通过（9 passed，包含 Step 6 回归测试）。
+
+## 18. Step 8 线索管理接口基线（新增）
+- 落地目录：
+  - `backend/app/modules/leads/`（`router.py`、`deps.py`、`schemas.py`、`repository.py`、`service.py`）。
+- 接口基线：
+  - `POST /api/v1/leads`：创建线索，命中去重规则时自动合并并写 `lead_merge_logs`。
+  - `GET /api/v1/leads`：支持 `status`、`owner_user_id`、`source_channel`、`keyword`、`created_at` 时间范围筛选。
+  - `GET /api/v1/leads/{lead_id}`、`PATCH /api/v1/leads/{lead_id}`、`POST /api/v1/leads/{lead_id}/assign`、`POST /api/v1/leads/{lead_id}/merge`。
+- 权限与约束：
+  - 接口授权复用 Step 6 RBAC 策略层，`sales` 按 owner 强约束（fail-closed）。
+  - `manager` 保持线索读权限，写接口默认拒绝。
+- 审计与脱敏：
+  - 已落地 `lead.created`、`lead.updated`、`lead.assign`、`lead.merged` 审计写入。
+  - 审计与合并载荷中的手机号按脱敏规则写入。
+- 测试基线：
+  - 新增 `backend/tests/test_leads_api.py`，覆盖去重、筛选、分配、更新、RBAC 与审计/合并日志落库。
+  - 本地 `python -m pytest -q` 通过（16 passed，含 Step 6/7 回归）。

@@ -23,6 +23,12 @@
   - 新增 FastAPI 应用入口 `backend/app/main.py` 与 API 聚合路由 `backend/app/api/router.py`。
   - 新增 `auth`、`leads`、`crm`、`content`、`kb`、`metrics`、`audit` 七个模块路由骨架（仅健康检查，占位无业务 CRUD）。
   - 新增 API 冒烟测试 `backend/tests/test_api_health.py`，并与 Step 6 回归测试一起通过（`python -m pytest -q`，9 passed）。
+- 已按用户指令实施计划 Step 8（线索管理接口：新增/查询/更新）：
+  - 在 `backend/app/modules/leads/` 新增 `deps.py`、`schemas.py`、`repository.py`、`service.py`，并重构 `router.py`，完成模块化分层。
+  - 已实现 `POST /api/v1/leads`（创建+自动去重合并）、`GET /api/v1/leads`（筛选列表）、`GET /api/v1/leads/{lead_id}`、`PATCH /api/v1/leads/{lead_id}`、`POST /api/v1/leads/{lead_id}/assign`、`POST /api/v1/leads/{lead_id}/merge`。
+  - 已接入 Header 模拟鉴权（`X-Actor-Role`、`X-Actor-User-Id`）并复用 Step 6 RBAC 策略层，落地 `sales` owner 约束与 `manager` 写入拒绝。
+  - 已落地 `lead.created`、`lead.updated`、`lead.assign`、`lead.merged` 审计记录，且手机号按脱敏规则写入日志。
+  - 新增接口测试 `backend/tests/test_leads_api.py`；本地执行 `python -m pytest -q` 通过（16 passed，含 Step 6/7 回归）。
 
 ### 产出文件
 - `docs/memory-bank/MVP_验收清单.md`：Step 1 的正式验收基线与评审记录载体。
@@ -47,6 +53,11 @@
 - `backend/README.md`：修复编码并补充 Step 7 启动与健康检查说明。
 - `docs/memory-bank/architecture.md`：更新至 V1.8，同步 Step 7 基线与 Step 8 门禁。
 - `docs/memory-bank/IMPLEMENTATION_PLAN.md`：更新至 V1.7，同步 Step 7 状态与验证门禁。
+- `backend/app/modules/leads/router.py`、`backend/app/modules/leads/deps.py`、`backend/app/modules/leads/schemas.py`、`backend/app/modules/leads/repository.py`、`backend/app/modules/leads/service.py`：Step 8 线索管理接口与分层实现。
+- `backend/tests/test_leads_api.py`：Step 8 接口集成测试（去重/筛选/分配/更新/RBAC/审计落库）。
+- `backend/app/main.py`：版本标识更新至 `0.1.0-step8`。
+- `docs/memory-bank/architecture.md`：更新至 V1.9，同步 Step 8 接口基线与 Step 9 门禁。
+- `docs/memory-bank/IMPLEMENTATION_PLAN.md`：更新至 V1.8，同步 Step 8 状态、产出与验证门禁。
 
 ### 验收状态
 - 产品负责人已确认 Step 1 通过（确认日期：2026-03-18）。
@@ -56,11 +67,13 @@
 - Step 5 已完成工程实现；迁移链路已通过本地验证，待用户测试确认（记录日期：2026-03-18）。
 - Step 6 已完成工程实现；权限单测已通过本地验证，待用户测试确认（记录日期：2026-03-18）。
 - Step 7 已完成工程实现；基础路由与健康检查已通过本地测试，待用户测试确认（记录日期：2026-03-18）。
+- Step 8 已完成工程实现；线索接口与去重/分配流程已通过本地测试，待用户测试确认（记录日期：2026-03-18）。
 
 ### 执行约束记录
 - Step 3 门禁已解除，Step 4 已实施完成。
 - Step 4 验证已完成，Step 5 已按用户明确指令启动并完成实现。
 - Step 6 已按用户明确指令启动并完成工程实现。
 - Step 7 已按用户明确指令启动并完成工程实现。
-- 在用户完成 Step 7 测试验证前，不启动 Step 8（线索管理接口）。
+- Step 8 已按用户明确指令启动并完成工程实现。
+- 在用户完成 Step 8 测试验证前，不启动 Step 9（CRM 跟进记录接口）。
 - 按分工约定，测试由用户侧执行，当前记录不包含测试执行结果。
