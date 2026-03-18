@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.3  
-状态：一期基线已锁定（Step 1-3 已完成，Step 4 待用户验证后启动）  
+版本：V1.5  
+状态：一期基线已锁定（Step 1-4 已完成并通过用户验证；Step 5 未启动）  
 更新日期：2026-03-18
 
 ## 1. 范围与边界
@@ -52,6 +52,7 @@
 - 约束与索引：
   - UNIQUE(`phone`)
   - INDEX(`company_name`,`name`)
+  - INDEX(`owner_user_id`,`status`,`created_at`)
 
 ### 4.3 lead_merge_logs（线索合并日志）
 - `id` UUID PK
@@ -78,6 +79,8 @@
 - `next_action_at` timestamptz null
 - `created_by` UUID FK -> users.id
 - `created_at` timestamptz
+- 约束与索引：
+  - INDEX(`lead_id`,`created_at`)
 
 ### 4.6 opportunities（商机）
 - `id` UUID PK
@@ -88,6 +91,8 @@
 - `owner_user_id` UUID FK -> users.id
 - `created_at` timestamptz
 - `updated_at` timestamptz
+- 约束与索引：
+  - INDEX(`owner_user_id`,`stage`,`updated_at`)
 
 ### 4.7 deals（成单）
 - `id` UUID PK
@@ -96,6 +101,8 @@
 - `deal_date` date
 - `created_by` UUID FK -> users.id
 - `created_at` timestamptz
+- 约束与索引：
+  - INDEX(`deal_date`)
 
 ### 4.8 content_tasks（内容生成任务）
 - `id` UUID PK
@@ -107,6 +114,8 @@
 - `created_by` UUID FK -> users.id
 - `created_at` timestamptz
 - `updated_at` timestamptz
+- 约束与索引：
+  - INDEX(`created_by`,`status`,`created_at`)
 
 ### 4.9 kb_sessions（客服会话）
 - `id` UUID PK
@@ -122,6 +131,9 @@
 - `content` text
 - `source_refs` jsonb null
 - `created_at` timestamptz
+- 约束与索引：
+  - INDEX(`session_id`,`created_at`)
+  - 规则：`role=assistant` 时，`source_refs` 必须非空。
 
 ### 4.11 audit_logs（审计日志）
 - `id` UUID PK
@@ -135,6 +147,19 @@
 - `request_id` varchar(64)
 - `created_at` timestamptz
 - 保留策略：180 天（到期归档或删除）。
+- 约束与索引：
+  - INDEX(`actor_user_id`,`created_at`)
+  - INDEX(`action`,`created_at`)
+  - INDEX(`request_id`)
+
+### 4.12 实体关系基线（Step 4 定版）
+- `users` 1 - N `leads`（负责人）。
+- `leads` 1 - N `follow_ups`（线索跟进历史）。
+- `leads` 1 - 1 `customers`（线索转客户）。
+- `leads` 1 - N `opportunities`（同一线索可有多次商机尝试）。
+- `opportunities` 1 - 1 `deals`（仅 `won` 阶段允许创建成单，且唯一）。
+- `users` 1 - N `content_tasks`、`kb_sessions`、`audit_logs`（操作主体）。
+- `kb_sessions` 1 - N `kb_messages`（会话消息流水）。
 
 ## 5. 状态流转规则
 
@@ -153,6 +178,7 @@
 - 重复处理：
   - 不新建 leads 主记录。
   - 新来源信息写入 `lead_merge_logs`。
+  - 写入 `merge_reason`，并保存来源载荷 `merged_payload`。
   - 记录审计日志 `lead.merged`。
 
 ## 7. 权限模型（RBAC）
@@ -237,7 +263,7 @@
 - 验证口径（Step 2）：
   - 仅验证基础服务健康检查（PostgreSQL、Redis、Dify），不包含业务接口联调。
 - 执行边界：
-  - Step 3（项目结构统一）已完成；在用户完成 Step 3 验证前，不启动 Step 4（核心数据模型设计）。
+  - Step 4（核心数据模型设计）已通过用户验证；Step 5（数据库与迁移流程）仅在用户明确指令后启动。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
