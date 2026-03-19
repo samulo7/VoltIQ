@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.12  
-状态：一期基线已锁定（Step 1-11 已完成工程实现；Step 11 待用户测试验证；Step 12 未启动）  
+版本：V1.16  
+状态：一期基线已锁定（Step 1-12 已完成并通过用户验证；Step 13 未启动）  
 更新日期：2026-03-19
 
 ## 1. 范围与边界
@@ -290,8 +290,9 @@
   - Step 8（线索管理接口）已按用户指令完成工程实现并通过本地回归测试。
   - Step 9（CRM 跟进记录接口）已按用户指令完成工程实现并通过用户门禁解除。
   - Step 10（商机与成单接口）已按用户指令完成工程实现。
-  - Step 11（内容生成任务接口）已按用户指令完成工程实现，待用户测试验证。
-  - 在用户完成 Step 11 验证前，不启动 Step 12（知识库接入方案确认）。
+  - Step 11（内容生成任务接口）已按用户指令完成工程实现。
+  - Step 12（知识库接入方案确认）已按用户指令完成工程实现，并通过用户测试验证（2026-03-19）。
+  - Step 13（智能客服基础问答接口）尚未启动，可按实施计划进入。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
@@ -417,3 +418,28 @@
   - 已落地 `content_task.created`、`content_task.queried`。
 - 测试基线：
   - 新增 `backend/tests/test_content_tasks_api.py`，覆盖创建、查询、筛选分页、RBAC 与审计断言。
+
+## 22. Step 12 知识库接入方案基线（新增）
+- 接入方式：
+  - 采用 Dify Service API（本地 Compose 环境）接入，默认走 `POST /chat-messages`，`response_mode=blocking`。
+  - 鉴权使用 `Authorization: Bearer {API_KEY}`，API Key 仅后端持有。
+- 落地目录：
+  - `backend/app/integrations/dify/`（`client.py`、`schemas.py`、`exceptions.py`）。
+  - `backend/scripts/verify_step12_dify.py`（连通性与来源回传验证脚本）。
+- 配置基线：
+  - 环境变量：`VOLTIQ_DIFY_BASE_URL`、`VOLTIQ_DIFY_API_KEY`、`VOLTIQ_DIFY_REQUEST_TIMEOUT_SECONDS`、`VOLTIQ_DIFY_RESPONSE_MODE`、`VOLTIQ_DIFY_REQUEST_MAX_RETRIES`、`VOLTIQ_DIFY_REQUEST_RETRY_BACKOFF_SECONDS`。
+  - `VOLTIQ_DIFY_BASE_URL` 兼容 host 级输入；未带路径时按 `/v1` 规范化。
+  - 支持 `blocking` 与 `streaming` 两种响应模式。
+- 会话与来源结构约束：
+  - Step 12 不新增数据库字段，不执行迁移。
+  - 会话延续依赖 Dify `conversation_id`；后续 Step 13 按既定方案写入消息 `source_refs` 元数据。
+  - 回答依据来自 Dify `metadata.retriever_resources`，作为“有依据回答”的统一来源载体。
+- 验证口径：
+  - 执行 `python scripts/verify_step12_dify.py` 成功返回。
+  - 断言 `answer` 非空且 `retriever_resources` 非空。
+  - 性能加固口径：请求超时后按指数退避自动重试；`streaming` 模式可用于降低首字等待时延。\n  - 输出清洗：统一剔除 `<details>...</details>` 以避免思考过程泄露。
+  - Step 12 阶段不新增 `/api/v1/kb` 业务问答接口；用户验证通过后 Step 13 门禁已解除。
+
+
+
+

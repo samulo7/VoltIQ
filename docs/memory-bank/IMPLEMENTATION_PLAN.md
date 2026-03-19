@@ -1,11 +1,11 @@
 ﻿# 实施计划（面向 AI 开发者）
 
-版本：V1.11  
-状态：Step 1-11 已完成工程实现（Step 11 待用户测试验证）；Step 12 未启动  
+版本：V1.15  
+状态：Step 1-12 已完成并通过用户验证；Step 13 未启动  
 更新日期：2026-03-19
 
 本计划基于 `docs/memory-bank/tech-stack.md` 与 `docs/memory-bank/AI_售电_产品设计文档.md`，并吸收了产品负责人在 2026-03-18 的澄清结论。先交付基础功能，完整功能在“扩展阶段”追加。
-执行门禁（2026-03-19）：Step 11 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 12。
+执行门禁（2026-03-19）：Step 12 用户验证已通过，可按计划启动 Step 13。
 
 
 ## 一期范围（锁定）
@@ -138,9 +138,23 @@
     - 全量回归 `pytest -q`：32 passed。
   - 当前环境对 `.pytest_cache` 写入受限（WinError 5），仅产生警告，不影响测试结论。
 
-### 12. 知识库接入方案确认
+### 12. 知识库接入方案确认（已完成，并通过用户验证）
 - 指令：采用 Dify API 接入，明确认证、会话与知识库结构。
 - 验证：测试账户可返回示例回答与来源信息。
+- 当前产出：
+  - 已新增 `backend/app/integrations/dify/client.py`、`backend/app/integrations/dify/schemas.py`、`backend/app/integrations/dify/exceptions.py`，完成 Dify Service API 接入封装。
+  - 已落地接入契约：默认请求 `POST /chat-messages`、`Authorization: Bearer <API_KEY>`，支持 `response_mode=blocking|streaming`。
+  - 已实现响应解析与失败映射：统一提取 `answer`、`conversation_id`、`metadata.retriever_resources`，并映射超时/HTTP 异常。
+  - 已新增 `backend/scripts/verify_step12_dify.py` 验证脚本，断言示例回答非空且来源信息非空。
+  - 已在 `backend/app/core/config.py` 与 `backend/.env.example` 增加 Dify 配置项：`VOLTIQ_DIFY_BASE_URL`、`VOLTIQ_DIFY_API_KEY`、`VOLTIQ_DIFY_REQUEST_TIMEOUT_SECONDS`、`VOLTIQ_DIFY_RESPONSE_MODE`、`VOLTIQ_DIFY_REQUEST_MAX_RETRIES`、`VOLTIQ_DIFY_REQUEST_RETRY_BACKOFF_SECONDS`。
+  - 已新增 `backend/tests/test_dify_client.py`，覆盖请求契约、响应解析、超时与错误映射。
+  - 已完成性能加固：Dify 请求支持指数退避重试；`streaming` 模式支持事件流解析。\n  - 已完成输出清洗：统一剔除 `<details>...</details>` 以避免思考过程泄露。
+  - 已更新 `backend/app/main.py` 版本标识至 `0.1.0-step12`。
+- 本地验证：
+  - 已新增自动化测试命令：`python -m pytest -q tests/test_dify_client.py`。
+  - 用户侧 Dify 连通性验证（2026-03-19）已通过：
+    - `python scripts/verify_step12_dify.py --query "请基于知识库回答：售电合同中直接交易的定义是什么？并给出依据。"` 返回 `[PASS]`，且 `sources=4`。
+  - Step 12 不新增 `/api/v1/kb` 业务问答接口，Step 13 门禁已解除。
 
 ### 13. 智能客服基础问答接口
 - 指令：封装问答接口，支持上下文连续对话与来源回传。
@@ -203,4 +217,7 @@
 - 多省市电价抓取与自动播报。
 - 内容自动发布与评论自动回复（openclaw）。
 - 高级权限、审计与合规模块。
+
+
+
 

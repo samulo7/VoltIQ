@@ -4,7 +4,37 @@
 
 ## 2026-03-19
 
-### 已完成事项
+### 已完成事项（Step 12）
+- 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
+- 已按用户指令实施计划 Step 12（知识库接入方案确认）：
+  - 在 `backend/app/integrations/dify/` 新增 `client.py`、`schemas.py`、`exceptions.py`，完成 Dify Service API 接入封装。
+  - 已实现统一请求契约：`POST /chat-messages`、`Authorization: Bearer <API_KEY>`、默认 `response_mode=blocking`。
+  - 已实现统一响应解析：提取 `answer`、`conversation_id`、`metadata.retriever_resources`，并映射超时/HTTP/载荷异常。
+  - 已新增并更新验证脚本 `backend/scripts/verify_step12_dify.py`，用于连通性与“回答有依据”口径验证（支持响应模式、超时、重试与退避参数）。
+  - 已新增单测 `backend/tests/test_dify_client.py`，覆盖请求构造、成功解析、超时与错误映射。
+  - 已扩展配置项 `VOLTIQ_DIFY_BASE_URL`、`VOLTIQ_DIFY_API_KEY`、`VOLTIQ_DIFY_REQUEST_TIMEOUT_SECONDS`、`VOLTIQ_DIFY_RESPONSE_MODE`。
+  - 已更新 `backend/app/main.py` 版本标识至 `0.1.0-step12`。
+  - 已更新 `docs/memory-bank/architecture.md` 至 V1.16，并更新 `docs/memory-bank/IMPLEMENTATION_PLAN.md` 至 V1.15。
+- 已完成 Step 12 性能加固改造：Dify Client 支持指数退避自动重试，`streaming` 模式支持事件流解析；用于降低超时导致的失败率并改善首字等待时延。\n- 已完成输出清洗：统一剔除 `<details>...</details>` 以避免思考过程泄露。
+- Step 12 执行边界遵循门禁：未新增 kb 业务问答 API，仅保留 /api/v1/kb/health，未启动 Step 13。
+
+### 产出文件（Step 12）
+- `backend/app/integrations/dify/client.py`、`backend/app/integrations/dify/schemas.py`、`backend/app/integrations/dify/exceptions.py`、`backend/app/integrations/dify/__init__.py`、`backend/app/integrations/__init__.py`：Step 12 Dify 接入封装。
+- `backend/scripts/verify_step12_dify.py`：Step 12 连通性与来源回传验证脚本。
+- `backend/tests/test_dify_client.py`：Step 12 单元测试（请求契约/解析/异常映射）。
+- `backend/app/core/config.py`、`backend/.env.example`、`backend/pyproject.toml`、`backend/app/main.py`：Step 12 运行时配置、依赖与版本标识更新。
+- `docs/memory-bank/architecture.md`、`docs/memory-bank/IMPLEMENTATION_PLAN.md`：Step 12 架构基线与实施状态同步。
+
+### 验收状态（Step 12）
+- Step 12 已完成工程实现并通过用户测试确认（确认日期：2026-03-19）。
+- Step 13 可按计划启动（当前尚未启动）。
+
+### 执行约束记录（当前）
+- Step 12 已按用户明确指令启动并完成工程实现。
+- Step 12 用户验证已通过，Step 13 门禁已解除。
+- 用户侧已完成真实 Dify 联调验证，命令输出为 `[PASS]` 且 `sources=4`。
+
+### 已完成事项（Step 11，历史记录）
 - 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
 - 已按用户指令实施计划 Step 11（内容生成任务接口）：
   - 在 `backend/app/modules/content/` 新增 `deps.py`、`schemas.py`、`repository.py`、`service.py`，并扩展 `router.py`，完成模块化分层。
@@ -137,3 +167,7 @@
 - Step 10 已按用户明确指令启动并完成工程实现。
 - 在用户完成 Step 10 测试验证前，不启动 Step 11（内容生成任务接口）。
 - 按分工约定，测试由用户侧执行，当前记录不包含测试执行结果。
+
+
+
+
