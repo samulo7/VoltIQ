@@ -1,11 +1,11 @@
 ﻿# 实施计划（面向 AI 开发者）
 
-版本：V1.10  
-状态：Step 1-10 已完成工程实现（Step 10 待用户测试验证）；Step 11 未启动  
-更新日期：2026-03-18
+版本：V1.11  
+状态：Step 1-11 已完成工程实现（Step 11 待用户测试验证）；Step 12 未启动  
+更新日期：2026-03-19
 
 本计划基于 `docs/memory-bank/tech-stack.md` 与 `docs/memory-bank/AI_售电_产品设计文档.md`，并吸收了产品负责人在 2026-03-18 的澄清结论。先交付基础功能，完整功能在“扩展阶段”追加。
-执行门禁（2026-03-18）：Step 10 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 11。
+执行门禁（2026-03-19）：Step 11 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 12。
 
 
 ## 一期范围（锁定）
@@ -115,11 +115,28 @@
   - 已新增 `backend/tests/test_crm_opportunities_deals_api.py`，覆盖商机/成单 CRUD 查询、流转约束、RBAC owner 约束、统计与审计断言。
   - 已更新 `backend/app/main.py` 版本标识至 `0.1.0-step10`。
 - 本地验证：
-  - 当前执行环境 Python 解释器不可用，未能完成本地 `pytest` 执行，待用户侧执行验证。
+  - 已于 2026-03-19 使用 Python 3.12 执行全量回归 `pytest -q`：32 passed（包含 Step 10 用例）。
+  - 当前环境对 `.pytest_cache` 写入受限（WinError 5），仅产生警告，不影响测试结论。
 
-### 11. 内容生成任务接口
+### 11. 内容生成任务接口（已完成，待用户验证）
 - 指令：实现文案/图片/短视频脚本三类任务创建与状态查询，先用占位结果。
 - 验证：任务提交后可查询状态与结果字段。
+- 当前产出：
+  - 已在 `backend/app/modules/content/` 新增 `deps.py`、`schemas.py`、`repository.py`、`service.py`，并扩展 `router.py`，完成 Step 11 接口分层落地。
+  - 已实现 `POST /api/v1/content/tasks`、`GET /api/v1/content/tasks`、`GET /api/v1/content/tasks/{task_id}`。
+  - 已落地“立即成功占位”口径：任务创建即写入 `status=succeeded`，并返回 `result_text` 与 `result_meta` 占位结果。
+  - 已接入 Header 模拟鉴权（`X-Actor-Role`、`X-Actor-User-Id`）并复用 Step 6 RBAC 策略层：
+    - `operator` 可创建与查询；
+    - `manager` 只读查询；
+    - `sales` 默认拒绝访问。
+  - 已落地 `content_task.created`、`content_task.queried` 审计日志。
+  - 已新增 `backend/tests/test_content_tasks_api.py`，覆盖三类任务创建、筛选分页、详情查询、RBAC 与审计断言。
+  - 已更新 `backend/app/main.py` 版本标识至 `0.1.0-step11`。
+- 本地验证：
+  - 已于 2026-03-19 使用 Python 3.12 完成本地测试：
+    - `tests/test_content_tasks_api.py`：4 passed。
+    - 全量回归 `pytest -q`：32 passed。
+  - 当前环境对 `.pytest_cache` 写入受限（WinError 5），仅产生警告，不影响测试结论。
 
 ### 12. 知识库接入方案确认
 - 指令：采用 Dify API 接入，明确认证、会话与知识库结构。

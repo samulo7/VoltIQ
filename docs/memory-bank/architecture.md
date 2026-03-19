@@ -1,8 +1,8 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.11  
-状态：一期基线已锁定（Step 1-10 已完成工程实现；Step 10 待用户测试验证；Step 11 未启动）  
-更新日期：2026-03-18
+版本：V1.12  
+状态：一期基线已锁定（Step 1-11 已完成工程实现；Step 11 待用户测试验证；Step 12 未启动）  
+更新日期：2026-03-19
 
 ## 1. 范围与边界
 - 当前文档仅覆盖 MVP 一期基础功能。
@@ -289,8 +289,9 @@
   - Step 7（后端基础框架搭建）已按用户指令完成工程实现。
   - Step 8（线索管理接口）已按用户指令完成工程实现并通过本地回归测试。
   - Step 9（CRM 跟进记录接口）已按用户指令完成工程实现并通过用户门禁解除。
-  - Step 10（商机与成单接口）已按用户指令完成工程实现，待用户测试验证。
-  - 在用户完成 Step 10 验证前，不启动 Step 11（内容生成任务接口）。
+  - Step 10（商机与成单接口）已按用户指令完成工程实现。
+  - Step 11（内容生成任务接口）已按用户指令完成工程实现，待用户测试验证。
+  - 在用户完成 Step 11 验证前，不启动 Step 12（知识库接入方案确认）。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
@@ -396,3 +397,23 @@
   - 已落地 `opportunity.created`、`opportunity.stage_changed`、`deal.created`。
 - 测试基线：
   - 新增 `backend/tests/test_crm_opportunities_deals_api.py`，覆盖创建/查询、流转约束、Deal 驱动 won、owner 权限、统计口径与审计落库断言。
+
+## 21. Step 11 内容生成任务接口基线（新增）
+- 落地目录：
+  - `backend/app/modules/content/`（`router.py`、`deps.py`、`schemas.py`、`repository.py`、`service.py`）。
+- 接口基线：
+  - `POST /api/v1/content/tasks`：创建内容生成任务。
+  - `GET /api/v1/content/tasks`：按任务类型、状态、创建人、时间范围筛选并分页查询。
+  - `GET /api/v1/content/tasks/{task_id}`：查询任务详情。
+- 业务规则与约束：
+  - Step 11 占位执行口径为“立即成功”：创建任务即写入 `status=succeeded`。
+  - 三类任务（`copywriting`、`image`、`video_script`）均返回占位 `result_text` 与 `result_meta`。
+- 权限与约束：
+  - 接口授权复用 Step 6 RBAC 策略层与现有 `content.tasks.create`、`content.tasks.list` endpoint key。
+  - `operator` 可创建与查询内容任务。
+  - `manager` 只读查询内容任务。
+  - `sales` 默认拒绝访问内容任务接口。
+- 审计基线：
+  - 已落地 `content_task.created`、`content_task.queried`。
+- 测试基线：
+  - 新增 `backend/tests/test_content_tasks_api.py`，覆盖创建、查询、筛选分页、RBAC 与审计断言。

@@ -1,6 +1,38 @@
 ﻿# 开发进度记录（Progress）
 
-更新时间：2026-03-18
+更新时间：2026-03-19
+
+## 2026-03-19
+
+### 已完成事项
+- 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
+- 已按用户指令实施计划 Step 11（内容生成任务接口）：
+  - 在 `backend/app/modules/content/` 新增 `deps.py`、`schemas.py`、`repository.py`、`service.py`，并扩展 `router.py`，完成模块化分层。
+  - 已实现 `POST /api/v1/content/tasks`、`GET /api/v1/content/tasks`、`GET /api/v1/content/tasks/{task_id}`。
+  - 已落地“立即成功占位”策略：任务创建即写入 `status=succeeded`，并返回占位 `result_text` 与 `result_meta`。
+  - 已接入 Header 模拟鉴权并复用 Step 6 RBAC 策略层，落地 `operator` 可写可读、`manager` 只读、`sales` 拒绝访问。
+  - 已落地 `content_task.created`、`content_task.queried` 审计记录。
+  - 已新增接口测试 `backend/tests/test_content_tasks_api.py`，覆盖创建/筛选分页/详情/RBAC/审计断言。
+- 已更新 `backend/app/main.py` 版本标识至 `0.1.0-step11`。
+- 已于 2026-03-19 完成本地测试验证：
+  - `python -m pytest -q tests/test_content_tasks_api.py` 通过（4 passed）。
+  - `python -m pytest -q` 全量回归通过（32 passed）。
+  - `.pytest_cache` 写入受限（WinError 5）产生告警，但不影响测试通过结论。
+
+### 产出文件
+- `backend/app/modules/content/router.py`、`backend/app/modules/content/deps.py`、`backend/app/modules/content/schemas.py`、`backend/app/modules/content/repository.py`、`backend/app/modules/content/service.py`：Step 11 内容任务接口与分层实现。
+- `backend/tests/test_content_tasks_api.py`：Step 11 接口集成测试（创建/查询/筛选分页/RBAC/审计）。
+- `backend/app/main.py`：版本标识更新至 `0.1.0-step11`。
+- `docs/memory-bank/architecture.md`：更新至 V1.12，同步 Step 11 接口基线与 Step 12 门禁。
+- `docs/memory-bank/IMPLEMENTATION_PLAN.md`：更新至 V1.11，同步 Step 11 状态、产出与验证门禁。
+
+### 验收状态
+- Step 11 已完成工程实现；内容任务接口已落地，待用户测试确认（记录日期：2026-03-19）。
+
+### 执行约束记录
+- Step 11 已按用户明确指令启动并完成工程实现。
+- 在用户完成 Step 11 测试验证前，不启动 Step 12（知识库接入方案确认）。
+- 按分工约定，测试由用户侧执行，当前记录不包含测试执行结果。
 
 ## 2026-03-18
 
