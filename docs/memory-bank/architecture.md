@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.10  
-状态：一期基线已锁定（Step 1-9 已完成工程实现；Step 9 待用户测试验证；Step 10 未启动）  
+版本：V1.11  
+状态：一期基线已锁定（Step 1-10 已完成工程实现；Step 10 待用户测试验证；Step 11 未启动）  
 更新日期：2026-03-18
 
 ## 1. 范围与边界
@@ -168,8 +168,11 @@
 - 任意状态可转 `invalid`（需记录原因）
 
 ### 5.2 商机阶段
-- `initial` -> `proposal` -> `negotiation` -> `won/lost`
-- `won` 时必须创建 `deals` 记录。
+- 阶段集合：`initial`、`proposal`、`negotiation`、`won`、`lost`
+- Step 10 流转实现口径：
+  - 通过阶段接口仅允许 `initial -> proposal -> negotiation -> lost`。
+  - 不允许通过阶段接口直接设置 `won`（`won` 仅由成单创建触发）。
+- `won` 时必须存在且仅存在 1 条 `deals` 记录（`opportunity_id` 唯一约束）。
 - `lost` 时必须写入丢单原因（扩展字段或审计日志）。
 
 ## 6. 去重与合并规则
@@ -285,8 +288,9 @@
   - Step 6（基础权限模型）已完成工程实现并通过本地单测。
   - Step 7（后端基础框架搭建）已按用户指令完成工程实现。
   - Step 8（线索管理接口）已按用户指令完成工程实现并通过本地回归测试。
-  - Step 9（CRM 跟进记录接口）已按用户指令完成工程实现，待用户测试验证。
-  - 在用户完成 Step 9 验证前，不启动 Step 10（商机与成单接口）。
+  - Step 9（CRM 跟进记录接口）已按用户指令完成工程实现并通过用户门禁解除。
+  - Step 10（商机与成单接口）已按用户指令完成工程实现，待用户测试验证。
+  - 在用户完成 Step 10 验证前，不启动 Step 11（内容生成任务接口）。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
@@ -369,3 +373,26 @@
 - 测试基线：
   - 新增 `backend/tests/test_crm_follow_ups_api.py`，覆盖创建/查询/更新/删除、owner 权限、客户归属校验、`latest_follow_up_at` 更新与重算、审计落库断言。
   - 本地 `python -m pytest -q` 通过（22 passed，含 Step 6/7/8 回归）。
+
+## 20. Step 10 商机与成单接口基线（新增）
+- 落地目录：
+  - `backend/app/modules/crm/`（`router.py`、`service.py`；复用 `repository.py`、`schemas.py`）。
+- 接口基线：
+  - `POST /api/v1/crm/opportunities`、`GET /api/v1/crm/opportunities`、`GET /api/v1/crm/opportunities/{opportunity_id}`。
+  - `PATCH /api/v1/crm/opportunities/{opportunity_id}/stage`（阶段流转）。
+  - `POST /api/v1/crm/deals`、`GET /api/v1/crm/deals`。
+  - `GET /api/v1/crm/opportunities/stats`（简要统计）。
+- 业务规则与约束：
+  - `Deal 驱动 won`：禁止通过阶段流转接口直接设置 `won`，仅在创建成单时自动将商机置为 `won`。
+  - 阶段流转接口允许：`initial -> proposal -> negotiation -> lost`。
+  - 切换至 `lost` 时必须提供 `lost_reason`（写入审计日志）。
+  - 创建成单仅允许商机处于 `negotiation` 且商机尚无成单记录。
+  - 创建商机时 `owner_user_id` 继承线索负责人；`customer_id`（若传入）必须归属同一线索。
+- 权限与约束：
+  - 接口授权复用 Step 6 RBAC 策略层与现有 `crm.opportunities.*`、`crm.deals.*` endpoint key。
+  - `sales` 按 owner 强约束，仅可操作本人商机与成单。
+  - `manager` 保持只读（可查不可写）。
+- 审计基线：
+  - 已落地 `opportunity.created`、`opportunity.stage_changed`、`deal.created`。
+- 测试基线：
+  - 新增 `backend/tests/test_crm_opportunities_deals_api.py`，覆盖创建/查询、流转约束、Deal 驱动 won、owner 权限、统计口径与审计落库断言。

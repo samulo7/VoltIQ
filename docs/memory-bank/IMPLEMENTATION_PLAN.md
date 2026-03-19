@@ -1,11 +1,11 @@
 ﻿# 实施计划（面向 AI 开发者）
 
-版本：V1.9  
-状态：Step 1-9 已完成工程实现（Step 9 待用户测试验证）；Step 10 未启动  
+版本：V1.10  
+状态：Step 1-10 已完成工程实现（Step 10 待用户测试验证）；Step 11 未启动  
 更新日期：2026-03-18
 
 本计划基于 `docs/memory-bank/tech-stack.md` 与 `docs/memory-bank/AI_售电_产品设计文档.md`，并吸收了产品负责人在 2026-03-18 的澄清结论。先交付基础功能，完整功能在“扩展阶段”追加。
-执行门禁（2026-03-18）：Step 9 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 10。
+执行门禁（2026-03-18）：Step 10 已完成工程实现并等待用户测试验证；在用户确认前不启动 Step 11。
 
 
 ## 一期范围（锁定）
@@ -104,9 +104,18 @@
   - 已新增 `backend/tests/test_crm_follow_ups_api.py`，覆盖 CRUD、RBAC、客户归属校验、审计落库与 `latest_follow_up_at` 更新规则。
   - 本地验证：`python -m pytest -q` 通过（22 passed，含 Step 6/7/8/9 回归）。
 
-### 10. 商机与成单接口
+### 10. 商机与成单接口（已完成，待用户验证）
 - 指令：实现商机阶段流转、成单记录与简要统计。
 - 验证：阶段变更可追溯，成单数据可查询。
+- 当前产出：
+  - 已在 `backend/app/modules/crm/` 扩展 Step 10 接口，新增 `POST /api/v1/crm/opportunities`、`GET /api/v1/crm/opportunities`、`GET /api/v1/crm/opportunities/{opportunity_id}`、`PATCH /api/v1/crm/opportunities/{opportunity_id}/stage`、`POST /api/v1/crm/deals`、`GET /api/v1/crm/deals`、`GET /api/v1/crm/opportunities/stats`。
+  - 已落地 `Deal 驱动 won` 规则：禁止通过阶段流转直接设置 `won`，仅允许在创建 `deal` 时自动将商机置为 `won`。
+  - 已落地阶段流转规则与校验：`initial -> proposal -> negotiation -> lost`；`lost` 必须提供 `lost_reason` 并记录审计。
+  - 已落地 `opportunity.created`、`opportunity.stage_changed`、`deal.created` 审计日志。
+  - 已新增 `backend/tests/test_crm_opportunities_deals_api.py`，覆盖商机/成单 CRUD 查询、流转约束、RBAC owner 约束、统计与审计断言。
+  - 已更新 `backend/app/main.py` 版本标识至 `0.1.0-step10`。
+- 本地验证：
+  - 当前执行环境 Python 解释器不可用，未能完成本地 `pytest` 执行，待用户侧执行验证。
 
 ### 11. 内容生成任务接口
 - 指令：实现文案/图片/短视频脚本三类任务创建与状态查询，先用占位结果。

@@ -36,6 +36,13 @@
   - 已实现新增跟进更新 `leads.latest_follow_up_at`，删除跟进后重算并回写该字段。
   - 已落地 `follow_up.created`、`follow_up.updated`、`follow_up.deleted` 审计记录。
   - 新增接口测试 `backend/tests/test_crm_follow_ups_api.py`；本地执行 `python -m pytest -q` 通过（22 passed，含 Step 6/7/8 回归）。
+- 已按用户指令实施计划 Step 10（商机与成单接口）：
+  - 在 `backend/app/modules/crm/` 扩展商机与成单接口，新增 `POST /api/v1/crm/opportunities`、`GET /api/v1/crm/opportunities`、`GET /api/v1/crm/opportunities/{opportunity_id}`、`PATCH /api/v1/crm/opportunities/{opportunity_id}/stage`、`POST /api/v1/crm/deals`、`GET /api/v1/crm/deals`、`GET /api/v1/crm/opportunities/stats`。
+  - 已落地 `Deal 驱动 won`：禁止通过阶段接口直接设置 `won`，仅允许在创建 `deal` 时自动置 `won`。
+  - 已落地阶段流转约束：`initial -> proposal -> negotiation -> lost`，并强制 `lost` 场景传入 `lost_reason`。
+  - 已落地 `opportunity.created`、`opportunity.stage_changed`、`deal.created` 审计记录。
+  - 已新增接口测试 `backend/tests/test_crm_opportunities_deals_api.py`，覆盖流转约束、RBAC owner、统计口径与审计断言。
+  - 当前执行环境 Python 解释器不可用，未完成本地 `pytest` 执行，待用户侧验证。
 
 ### 产出文件
 - `docs/memory-bank/MVP_验收清单.md`：Step 1 的正式验收基线与评审记录载体。
@@ -70,6 +77,11 @@
 - `backend/app/main.py`：版本标识更新至 `0.1.0-step9`。
 - `docs/memory-bank/architecture.md`：更新至 V1.10，同步 Step 9 接口基线与 Step 10 门禁。
 - `docs/memory-bank/IMPLEMENTATION_PLAN.md`：更新至 V1.9，同步 Step 9 状态、产出与验证门禁。
+- `backend/app/modules/crm/router.py`、`backend/app/modules/crm/service.py`：Step 10 商机与成单接口实现（商机 CRUD 查询、阶段流转、成单创建与统计）。
+- `backend/tests/test_crm_opportunities_deals_api.py`：Step 10 接口集成测试（流转约束/RBAC/统计/审计）。
+- `backend/app/main.py`：版本标识更新至 `0.1.0-step10`。
+- `docs/memory-bank/architecture.md`：更新至 V1.11，同步 Step 10 接口基线与 Step 11 门禁。
+- `docs/memory-bank/IMPLEMENTATION_PLAN.md`：更新至 V1.10，同步 Step 10 状态、产出与验证门禁。
 
 ### 验收状态
 - 产品负责人已确认 Step 1 通过（确认日期：2026-03-18）。
@@ -81,6 +93,7 @@
 - Step 7 已完成工程实现；基础路由与健康检查已通过本地测试，待用户测试确认（记录日期：2026-03-18）。
 - Step 8 已完成工程实现；线索接口与去重/分配流程已通过本地测试，待用户测试确认（记录日期：2026-03-18）。
 - Step 9 已完成工程实现；CRM 跟进接口与最近跟进时间回写规则已通过本地测试，待用户测试确认（记录日期：2026-03-18）。
+- Step 10 已完成工程实现；商机/成单接口已落地，待用户测试确认（记录日期：2026-03-18）。
 
 ### 执行约束记录
 - Step 3 门禁已解除，Step 4 已实施完成。
@@ -89,5 +102,6 @@
 - Step 7 已按用户明确指令启动并完成工程实现。
 - Step 8 已按用户明确指令启动并完成工程实现。
 - Step 9 已按用户明确指令启动并完成工程实现。
-- 在用户完成 Step 9 测试验证前，不启动 Step 10（商机与成单接口）。
+- Step 10 已按用户明确指令启动并完成工程实现。
+- 在用户完成 Step 10 测试验证前，不启动 Step 11（内容生成任务接口）。
 - 按分工约定，测试由用户侧执行，当前记录不包含测试执行结果。
