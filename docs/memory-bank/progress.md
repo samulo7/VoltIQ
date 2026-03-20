@@ -1,6 +1,34 @@
 ﻿# 开发进度记录（Progress）
 
-更新时间：2026-03-19
+更新时间：2026-03-20
+
+## 2026-03-20
+
+### 运行问题记录（Dify / Step 12 联调）
+- 现象：`nginx` 启动反复重启，日志报错 `host not found in upstream "api"`，导致 `/v1` 请求不可用。
+- 排查：`api` 服务在 `voltiqdify_default` 网络内，DNS 解析正常；`nginx` 容器未正确挂载网络（启动时无法解析 `api`）。
+- 处理：执行 `docker compose -f infra/dify/docker/docker-compose.yaml up -d --force-recreate nginx` 重新创建 `nginx`，恢复 `api` 上游解析与 80/443 端口监听。
+- 结论：需确保 `nginx` 与 `api/web` 使用同一 Compose 项目启动，避免单独启动导致网络与 DNS 解析异常。
+
+### 已完成事项（Step 12 速度测试能力）
+- 已新增 Step 12 延迟基准脚本 `backend/scripts/benchmark_step12_dify_latency.py`：
+  - 支持 `blocking`/`streaming` 双模式采样、预热样本剔除、固定题集循环采样。
+  - 支持输出 `avg/p50/p95`、`<= 阈值达标率`、失败率、慢样本 Top3 与失败原因分布。
+  - `streaming` 新增 `TTFT`（首字时间）统计：`avg_ttft/p50_ttft/p95_ttft`。
+  - `streaming` 采样改为真实 SSE 事件流测量，避免整包读取导致的统计偏差。
+  - 支持输出 CSV 明细与 Markdown 汇总（默认输出目录 `artifacts/`）。
+- 已新增单测 `backend/tests/test_step12_latency_benchmark.py`，覆盖模式解析、分位数计算、汇总口径与报告渲染。
+- 已更新 `backend/.env.example` 默认 `VOLTIQ_DIFY_RESPONSE_MODE=blocking`，对齐当前稳定测量口径。
+- 已完成本地回归：
+  - `python -m pytest -q tests/test_step12_latency_benchmark.py` 通过（4 passed）。
+  - `python -m pytest -q tests/test_dify_client.py tests/test_step12_latency_benchmark.py` 通过（14 passed）。
+- 已完成脚本烟测（当前环境未配置真实 Key）：
+  - `python scripts/benchmark_step12_dify_latency.py --sample-count 1 --warmup-count 0 --modes blocking`
+  - 输出 `[FAIL] mode=blocking Dify API key is not configured.`（错误信息符合预期，脚本失败路径可读）。
+
+### 文档更新（Step 12 测试流程）
+- 已新增 `docs/STEP12_知识库问答测速与排障流程.md`，沉淀可复制执行的测速命令、结果判读口径与常见异常排障路径。
+- 已更新 `docs/README.md`，补充 Step 12 测试流程文档入口。
 
 ## 2026-03-19
 

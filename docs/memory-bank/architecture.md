@@ -1,8 +1,8 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.16  
-状态：一期基线已锁定（Step 1-12 已完成并通过用户验证；Step 13 未启动）  
-更新日期：2026-03-19
+版本：V1.18  
+状态：一期基线已锁定（Step 1-12 已完成并通过用户验证；Step 13 未启动；Step 12 测速能力含 TTFT 统计）  
+更新日期：2026-03-20
 
 ## 1. 范围与边界
 - 当前文档仅覆盖 MVP 一期基础功能。
@@ -439,6 +439,27 @@
   - 断言 `answer` 非空且 `retriever_resources` 非空。
   - 性能加固口径：请求超时后按指数退避自动重试；`streaming` 模式可用于降低首字等待时延。\n  - 输出清洗：统一剔除 `<details>...</details>` 以避免思考过程泄露。
   - Step 12 阶段不新增 `/api/v1/kb` 业务问答接口；用户验证通过后 Step 13 门禁已解除。
+
+## 23. Step 12 延迟基准测试能力（新增）
+- 目标口径：
+  - 以“真实问答端到端耗时”评估 Step 12 速度表现，默认阈值 `<= 2s`（可通过参数覆盖）。
+  - 支持 `blocking` 与 `streaming` 两种模式独立采样，支持预热样本与正式样本分离统计。
+- 落地目录：
+  - `backend/scripts/benchmark_step12_dify_latency.py`：Step 12 延迟基准脚本。
+  - `backend/tests/test_step12_latency_benchmark.py`：统计逻辑与汇总输出单测。
+- 输出产物：
+  - `artifacts/step12-latency-blocking.csv`
+  - `artifacts/step12-latency-streaming.csv`
+  - `artifacts/step12-latency-summary.md`
+- 统计口径：
+  - 按模式输出 `avg/p50/p95`、`<= 阈值达标率`、`失败率`。
+  - `streaming` 模式新增 `TTFT`（首字时间）统计：`avg_ttft/p50_ttft/p95_ttft`。
+  - 输出慢样本 Top3 与失败原因分布，便于定位慢查询与异常类型。
+- 实现说明：
+  - `streaming` 延迟采样改为真实 SSE 事件流测量，不再依赖整包响应读取，避免“完整结束时间误代替首字时延”。
+  - `backend/.env.example` 默认 `VOLTIQ_DIFY_RESPONSE_MODE=blocking`，作为当前稳定口径。
+- 约束边界：
+  - 本能力仅新增离线测速脚本与测试，不新增后端 API、不变更数据库结构、不触发迁移。
 
 
 
