@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import datetime as dt
 import uuid
+from enum import Enum
+from typing import TypeVar
 from typing import Any
 
 from sqlalchemy import (
@@ -29,13 +31,37 @@ from app.db.enums import (
     UserStatus,
 )
 
-user_role_enum = SqlEnum(UserRole, name="user_role")
-user_status_enum = SqlEnum(UserStatus, name="user_status")
-lead_status_enum = SqlEnum(LeadStatus, name="lead_status")
-opportunity_stage_enum = SqlEnum(OpportunityStage, name="opportunity_stage")
-content_task_type_enum = SqlEnum(ContentTaskType, name="content_task_type")
-content_task_status_enum = SqlEnum(ContentTaskStatus, name="content_task_status")
-kb_message_role_enum = SqlEnum(KbMessageRole, name="kb_message_role")
+
+EnumValue = TypeVar("EnumValue", bound=Enum)
+
+
+def _enum_values(enum_cls: type[EnumValue]) -> list[str]:
+    return [str(item.value) for item in enum_cls]
+
+
+user_role_enum = SqlEnum(UserRole, name="user_role", values_callable=_enum_values)
+user_status_enum = SqlEnum(UserStatus, name="user_status", values_callable=_enum_values)
+lead_status_enum = SqlEnum(LeadStatus, name="lead_status", values_callable=_enum_values)
+opportunity_stage_enum = SqlEnum(
+    OpportunityStage,
+    name="opportunity_stage",
+    values_callable=_enum_values,
+)
+content_task_type_enum = SqlEnum(
+    ContentTaskType,
+    name="content_task_type",
+    values_callable=_enum_values,
+)
+content_task_status_enum = SqlEnum(
+    ContentTaskStatus,
+    name="content_task_status",
+    values_callable=_enum_values,
+)
+kb_message_role_enum = SqlEnum(
+    KbMessageRole,
+    name="kb_message_role",
+    values_callable=_enum_values,
+)
 
 
 class User(Base):

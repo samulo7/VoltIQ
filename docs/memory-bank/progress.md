@@ -4,6 +4,52 @@
 
 ## 2026-03-20
 
+### 已完成事项（Step 13）
+- 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
+- 已按用户指令实施计划 Step 13（智能客服基础问答接口）：
+  - 在 `backend/app/modules/kb/` 新增 `deps.py`、`schemas.py`、`repository.py`、`service.py`，并扩展 `router.py`，完成 Step 13 接口分层落地。
+  - 已实现 `POST /api/v1/kb/sessions/chat`（支持自动建会话、`session_key` 续聊、来源回传）。
+  - 已实现 `GET /api/v1/kb/sessions`（会话分页查询，当前按当前用户隔离）。
+  - 已落地会话与消息持久化：`kb_sessions`、`kb_messages` 双写；`assistant` 消息强制写入 `source_refs`。
+  - 已落地上游失败映射：Dify 超时映射 `504`，其他上游异常映射 `502`；来源为空返回失败且不落库。
+  - 已落地 `kb.session.chatted` 审计日志。
+  - 已新增 Step 13 验证脚本 `backend/scripts/verify_step13_kb_api.py`，用于“5 条典型问题”验收。
+  - 已新增接口测试 `backend/tests/test_kb_chat_api.py`，覆盖自动建会话、续聊、越权拦截、来源缺失失败、超时映射与 RBAC。
+  - 已更新 `backend/app/main.py` 版本标识至 `0.1.0-step13`。
+  - 已更新 `docs/memory-bank/architecture.md` 至 V1.19，并更新 `docs/memory-bank/IMPLEMENTATION_PLAN.md` 至 V1.16。
+- 已完成本地回归：
+  - `python -m pytest -q tests/test_kb_chat_api.py tests/test_rbac_policy.py tests/test_api_health.py` 通过（15 passed）。
+  - `python -m pytest -q` 全量回归通过（53 passed）。
+
+### 产出文件（Step 13）
+- `backend/app/modules/kb/router.py`、`backend/app/modules/kb/deps.py`、`backend/app/modules/kb/schemas.py`、`backend/app/modules/kb/repository.py`、`backend/app/modules/kb/service.py`：Step 13 智能客服问答接口与分层实现。
+- `backend/tests/test_kb_chat_api.py`：Step 13 接口集成测试（会话续聊/来源回传/RBAC/异常映射/越权拦截）。
+- `backend/scripts/verify_step13_kb_api.py`：Step 13 五问验收脚本（默认超时提升至 `120s`，新增网络异常友好输出）。
+- `backend/app/db/models.py`：枚举绑定修复（统一按枚举 `.value` 写入，避免大小写不一致导致的数据库枚举报错）。
+- `backend/app/main.py`：版本标识更新至 `0.1.0-step13`。
+- `docs/memory-bank/architecture.md`、`docs/memory-bank/IMPLEMENTATION_PLAN.md`：Step 13 架构基线与实施状态同步。
+
+### 验收状态（Step 13）
+- Step 13 已完成工程实现并通过用户测试确认（确认日期：2026-03-20）。
+
+### 执行约束记录（当前）
+- Step 13 已按用户明确指令启动并完成工程实现。
+- Step 13 用户验证已通过，Step 14 门禁已解除（当前未启动）。
+
+### 运行问题记录（Step 13 用户验证）
+- 现象 1：执行 `python scripts/verify_step13_kb_api.py ...` 报错 `WinError 10061`，无法连接 `127.0.0.1:8000`。
+- 原因 1：本地后端 API 服务未启动，验收脚本默认访问 `http://127.0.0.1:8000`。
+- 现象 2：后端启动后，`POST /api/v1/kb/sessions/chat` 返回 `500`，日志报错 `invalid input value for enum user_role: "OPERATOR"`（同类 `ACTIVE` 问题同源）。
+- 原因 2：`SQLAlchemy Enum` 默认按枚举名（大写）绑定，数据库枚举实际值为小写（如 `operator`、`active`）。
+- 现象 3：接口修复后，验收脚本仍可能报 `httpx.ReadTimeout`。
+- 原因 3：脚本默认超时 `30s`，在 Dify 慢响应 + 后端重试退避场景下可能超时。
+- 处理：
+  - 启动后端并完成健康检查：`python -m uvicorn app.main:app --host 127.0.0.1 --port 8000`、`GET /healthz` 返回 `200`。
+  - 修复枚举绑定：`backend/app/db/models.py` 的 `SqlEnum` 统一使用 `values_callable` 按 `.value`（小写）读写。
+  - 新建可用验证账号：`operator + active` 用户 `d77487b2-faed-411a-871e-0f761b045812`（仅用于 Step 13 验证）。
+  - 优化验收脚本：`backend/scripts/verify_step13_kb_api.py` 默认超时改为 `120s`，并对 `httpx.HTTPError` 输出 `[FAIL]` 友好错误。
+- 结果：`python scripts/verify_step13_kb_api.py --actor-user-id d77487b2-faed-411a-871e-0f761b045812 --actor-role operator --timeout-seconds 120` 已通过（Q1-Q5 全部 `[PASS]`）。
+
 ### 运行问题记录（Dify / Step 12 联调）
 - 现象：`nginx` 启动反复重启，日志报错 `host not found in upstream "api"`，导致 `/v1` 请求不可用。
 - 排查：`api` 服务在 `voltiqdify_default` 网络内，DNS 解析正常；`nginx` 容器未正确挂载网络（启动时无法解析 `api`）。

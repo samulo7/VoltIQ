@@ -1,11 +1,11 @@
 ﻿# 实施计划（面向 AI 开发者）
 
-版本：V1.15  
-状态：Step 1-12 已完成并通过用户验证；Step 13 未启动  
-更新日期：2026-03-19
+版本：V1.17  
+状态：Step 1-13 已完成并通过用户验证；Step 14 未启动  
+更新日期：2026-03-20
 
 本计划基于 `docs/memory-bank/tech-stack.md` 与 `docs/memory-bank/AI_售电_产品设计文档.md`，并吸收了产品负责人在 2026-03-18 的澄清结论。先交付基础功能，完整功能在“扩展阶段”追加。
-执行门禁（2026-03-19）：Step 12 用户验证已通过，可按计划启动 Step 13。
+执行门禁（2026-03-20）：Step 13 用户验证已通过，可按计划启动 Step 14（当前未启动）。
 
 
 ## 一期范围（锁定）
@@ -156,13 +156,32 @@
     - `python scripts/verify_step12_dify.py --query "请基于知识库回答：售电合同中直接交易的定义是什么？并给出依据。"` 返回 `[PASS]`，且 `sources=4`。
   - Step 12 不新增 `/api/v1/kb` 业务问答接口，Step 13 门禁已解除。
 
-### 13. 智能客服基础问答接口
+### 13. 智能客服基础问答接口（已完成，并通过用户验证）
 - 指令：封装问答接口，支持上下文连续对话与来源回传。
 - 验证：5 条典型问题均返回非空且有依据回答。
+- 当前产出：
+  - 已在 `backend/app/modules/kb/` 新增 `deps.py`、`schemas.py`、`repository.py`、`service.py`，并扩展 `router.py`，完成 Step 13 接口分层落地。
+  - 已实现 `POST /api/v1/kb/sessions/chat`：
+    - 支持首次不传 `session_key` 自动建会话；
+    - 支持传入 `session_key` 连续对话；
+    - 返回 `session_key`、`conversation_id`、`message_id`、`answer`、`sources`。
+  - 已实现 `GET /api/v1/kb/sessions` 会话分页查询（当前按当前用户隔离会话）。
+  - 已落地会话与消息持久化：`kb_sessions` + `kb_messages` 双写入，并对 `assistant` 消息强制写 `source_refs`。
+  - 已落地 `kb.session.chatted` 审计记录。
+  - 已新增验证脚本 `backend/scripts/verify_step13_kb_api.py`，串行发送 5 条典型问题并断言回答/来源非空。
+  - 已新增接口测试 `backend/tests/test_kb_chat_api.py`，覆盖自动建会话、续聊、越权拦截、来源缺失失败、超时映射与 RBAC。
+  - 已更新 `backend/app/main.py` 版本标识至 `0.1.0-step13`。
+- 本地验证：
+  - `python -m pytest -q tests/test_kb_chat_api.py tests/test_rbac_policy.py tests/test_api_health.py` 通过（15 passed）。
+  - `python -m pytest -q` 全量回归通过（53 passed）。
+  - 用户侧验收（2026-03-20）通过：
+    - `python scripts/verify_step13_kb_api.py --actor-user-id d77487b2-faed-411a-871e-0f761b045812 --actor-role operator`
+    - 输出 `Q1-Q5 [PASS]`，最终 `Step 13 KB API verification succeeded.`
 
 ### 14. 后端指标接口（基础）
 - 指令：提供线索数、成单数、转化率等指标接口，统一时区与口径。
 - 验证：统计结果与数据库一致，时间过滤生效。
+- 执行状态：Step 13 门禁已解除，Step 14 当前未启动。
 
 ### 15. 前端框架初始化
 - 指令：使用 React + TypeScript + Ant Design Pro 初始化前端工程。

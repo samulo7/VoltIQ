@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.18  
-状态：一期基线已锁定（Step 1-12 已完成并通过用户验证；Step 13 未启动；Step 12 测速能力含 TTFT 统计）  
+版本：V1.20  
+状态：一期基线已锁定（Step 1-13 已完成并通过用户验证；Step 14 未启动；Step 12 测速能力含 TTFT 统计）  
 更新日期：2026-03-20
 
 ## 1. 范围与边界
@@ -292,7 +292,8 @@
   - Step 10（商机与成单接口）已按用户指令完成工程实现。
   - Step 11（内容生成任务接口）已按用户指令完成工程实现。
   - Step 12（知识库接入方案确认）已按用户指令完成工程实现，并通过用户测试验证（2026-03-19）。
-  - Step 13（智能客服基础问答接口）尚未启动，可按实施计划进入。
+  - Step 13（智能客服基础问答接口）已完成并通过用户测试验证（2026-03-20）。
+  - Step 14（后端指标接口）门禁已解除，当前未启动。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
@@ -432,13 +433,13 @@
   - 支持 `blocking` 与 `streaming` 两种响应模式。
 - 会话与来源结构约束：
   - Step 12 不新增数据库字段，不执行迁移。
-  - 会话延续依赖 Dify `conversation_id`；后续 Step 13 按既定方案写入消息 `source_refs` 元数据。
+  - 会话延续依赖 Dify `conversation_id`；Step 13 已按该约束落地会话与消息持久化。
   - 回答依据来自 Dify `metadata.retriever_resources`，作为“有依据回答”的统一来源载体。
 - 验证口径：
   - 执行 `python scripts/verify_step12_dify.py` 成功返回。
   - 断言 `answer` 非空且 `retriever_resources` 非空。
   - 性能加固口径：请求超时后按指数退避自动重试；`streaming` 模式可用于降低首字等待时延。\n  - 输出清洗：统一剔除 `<details>...</details>` 以避免思考过程泄露。
-  - Step 12 阶段不新增 `/api/v1/kb` 业务问答接口；用户验证通过后 Step 13 门禁已解除。
+  - Step 12 阶段不新增 `/api/v1/kb` 业务问答接口；该门禁已在 Step 13 实施时遵循并解除。
 
 ## 23. Step 12 延迟基准测试能力（新增）
 - 目标口径：
@@ -460,6 +461,33 @@
   - `backend/.env.example` 默认 `VOLTIQ_DIFY_RESPONSE_MODE=blocking`，作为当前稳定口径。
 - 约束边界：
   - 本能力仅新增离线测速脚本与测试，不新增后端 API、不变更数据库结构、不触发迁移。
+
+## 24. Step 13 智能客服基础问答接口基线（新增）
+- 落地目录：
+  - `backend/app/modules/kb/`（`router.py`、`deps.py`、`schemas.py`、`repository.py`、`service.py`）。
+- 接口基线：
+  - `POST /api/v1/kb/sessions/chat`：客服问答入口，支持 `session_key` 续聊与来源回传。
+  - `GET /api/v1/kb/sessions`：客服会话分页查询（当前按当前用户隔离）。
+- 会话与消息规则：
+  - 首轮不传 `session_key` 时自动创建会话，`session_key` 对齐 Dify `conversation_id`。
+  - 续聊时透传 `session_key` 到 Dify `conversation_id`，维持上下文连续。
+  - 每次成功问答写入两条消息：`user` + `assistant`。
+  - `assistant` 消息必须写入 `source_refs.retriever_resources`（来源非空约束）。
+- 失败与一致性规则：
+  - Dify 返回空回答或空来源时，接口返回上游错误且不写入会话消息。
+  - Dify 超时映射为 `504`，其他上游失败映射为 `502`。
+  - 会话归属校验：仅会话所有者可续聊该 `session_key`。
+- 权限与审计：
+  - 接口授权复用 Step 6 RBAC：`kb.sessions.chat`、`kb.sessions.list`。
+  - `operator`、`manager` 允许访问；`sales` 默认拒绝。
+  - 已落地 `kb.session.chatted` 审计日志。
+- 测试与验证基线：
+  - 新增 `backend/tests/test_kb_chat_api.py`，覆盖自动建会话、续聊、来源缺失失败、超时映射、越权拦截与 RBAC。
+  - 新增 `backend/scripts/verify_step13_kb_api.py`，串行 5 条典型问题验收“回答非空 + 来源非空”。
+  - 本地验证：`python -m pytest -q` 全量通过（53 passed）。
+  - 用户验证：`python scripts/verify_step13_kb_api.py --actor-user-id d77487b2-faed-411a-871e-0f761b045812 --actor-role operator` 通过（Q1-Q5 全部 `[PASS]`）。
+- 执行边界：
+  - Step 13 用户验证已通过，Step 14 门禁已解除（当前仍未启动）。
 
 
 
