@@ -4,6 +4,29 @@
 
 ## 2026-03-20
 
+### 已完成事项（Step 15）
+- 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
+- 已按用户指令实施计划 Step 15（前端框架初始化）：
+  - 使用 Ant Design Pro 官方脚手架初始化前端工程，落地 React + TypeScript + Ant Design Pro 模板。
+  - 初始化目录为 `frontend/`，未触发 Step 16 登录与角色权限对接。
+  - 更新 `frontend/README.md`，补充基于 `pnpm` 的启动与构建说明。
+  - 补充依赖 `swagger-ui-dist`，修复 OpenAPI 插件在开发启动时的缺失报错。
+  - 已更新 `docs/memory-bank/architecture.md` 至 V1.23，并更新 `docs/memory-bank/IMPLEMENTATION_PLAN.md` 至 V1.20。
+
+### 产出文件（Step 15）
+- `frontend/`：Ant Design Pro 模板工程（`src/`、`config/`、`public/` 等目录）。
+- `frontend/package.json`：前端依赖与脚本。
+- `frontend/README.md`：本地启动说明（pnpm）。
+- `docs/memory-bank/architecture.md`、`docs/memory-bank/IMPLEMENTATION_PLAN.md`：Step 15 架构基线与实施状态同步。
+
+### 验收状态（Step 15）
+- Step 15 已完成并通过用户测试确认（确认日期：2026-03-20）。
+- 用户验证结果：`pnpm install`、`pnpm start` 启动成功，访问 `http://localhost:8000/welcome` 页面正常。
+
+### 执行约束记录（Step 15）
+- Step 15 已按用户明确指令启动并完成工程初始化。
+- Step 15 用户验证已通过，Step 16 门禁已解除（当前未启动）。
+
 ### 已完成事项（Step 14）
 - 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
 - 已按用户指令实施计划 Step 14（后端指标接口）：
@@ -30,7 +53,7 @@
 
 ### 执行约束记录（Step 14）
 - Step 14 已按用户明确指令启动并完成工程实现。
-- Step 14 用户验证已通过，Step 15 门禁已解除（当前未启动）。
+- Step 14 用户验证已通过，Step 15 已完成并通过用户验证，Step 16 门禁已解除（当前未启动）。
 
 ### 已完成事项（Step 13）
 - 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
@@ -117,7 +140,8 @@
   - 已扩展配置项 `VOLTIQ_DIFY_BASE_URL`、`VOLTIQ_DIFY_API_KEY`、`VOLTIQ_DIFY_REQUEST_TIMEOUT_SECONDS`、`VOLTIQ_DIFY_RESPONSE_MODE`。
   - 已更新 `backend/app/main.py` 版本标识至 `0.1.0-step12`。
   - 已更新 `docs/memory-bank/architecture.md` 至 V1.16，并更新 `docs/memory-bank/IMPLEMENTATION_PLAN.md` 至 V1.15。
-- 已完成 Step 12 性能加固改造：Dify Client 支持指数退避自动重试，`streaming` 模式支持事件流解析；用于降低超时导致的失败率并改善首字等待时延。\n- 已完成输出清洗：统一剔除 `<details>...</details>` 以避免思考过程泄露。
+- 已完成 Step 12 性能加固改造：Dify Client 支持指数退避自动重试，`streaming` 模式支持事件流解析；用于降低超时导致的失败率并改善首字等待时延。
+- 已完成输出清洗：统一剔除 `<details>...</details>` 以避免思考过程泄露。
 - Step 12 执行边界遵循门禁：未新增 kb 业务问答 API，仅保留 /api/v1/kb/health，未启动 Step 13。
 
 ### 产出文件（Step 12）
@@ -269,6 +293,12 @@
 - Step 10 已按用户明确指令启动并完成工程实现。
 - 在用户完成 Step 10 测试验证前，不启动 Step 11（内容生成任务接口）。
 - 按分工约定，测试由用户侧执行，当前记录不包含测试执行结果。
+
+
+
+
+
+
 
 
 
