@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.24  
-状态：一期基线已锁定（Step 1-15 已完成并通过用户验证；Step 16 未启动；Step 12 测速能力含 TTFT 统计）  
+版本：V1.26  
+状态：一期基线已锁定（Step 1-16 已完成并通过用户验证；Step 12 测速能力含 TTFT 统计）  
 更新日期：2026-03-20
 
 ## 1. 范围与边界
@@ -190,7 +190,7 @@
   - `sales`（销售）
   - `manager`（管理层）
 - 一期控制粒度：接口级 + 菜单级。
-- Step 6 落地形态：先落地框架无关的策略层（可测试）；Step 7 已完成后端路由骨架接入，后续在 Step 15 接入前端菜单渲染。
+- Step 6 落地形态：先落地框架无关的策略层（可测试）；Step 7 已完成后端路由骨架接入，Step 16 已完成前端菜单与操作项权限渲染接入。
 
 ### 7.1 权限矩阵（一期）
 - 运营：
@@ -295,7 +295,7 @@
   - Step 13（智能客服基础问答接口）已完成并通过用户测试验证（2026-03-20）。
   - Step 14（后端指标接口）已完成并通过用户测试验证（2026-03-20）。
   - Step 15（前端框架初始化）已完成并通过用户测试验证（2026-03-20）。
-  - Step 16 当前未启动。
+  - Step 16（登录与角色切换）已完成并通过用户测试验证（2026-03-20）。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
@@ -515,12 +515,34 @@
 - 版本基线：
   - `backend/app/main.py` 版本标识更新至 `0.1.0-step14`。
 - 执行边界：
-  - Step 14 用户验证已通过，Step 15 已完成并通过用户验证；Step 16 门禁已解除（当前未启动）。
+  - Step 14 用户验证已通过，Step 15 已完成并通过用户验证；Step 16 已完成并通过用户验证，Step 17 门禁已解除。
 
 ## 26. Step 15 前端框架初始化基线（新增）
 - 模板：Ant Design Pro 官方模板（React + TypeScript + Ant Design Pro，Umi Max）。
 - 初始化目录：`frontend/`。
 - 运行方式：使用 `pnpm` 安装与启动（具体命令见 `frontend/README.md`）。
 - 执行边界：仅完成脚手架初始化，不包含登录与角色权限对接（Step 16 之后执行）。
+
+## 27. Step 16 登录与角色切换基线（新增）
+- 后端认证接口：
+  - 已在 `backend/app/modules/auth/` 新增 `deps.py`、`schemas.py`、`repository.py`、`security.py`、`service.py` 并扩展 `router.py`。
+  - 已实现 `POST /api/v1/auth/login`、`POST /api/v1/auth/refresh`、`GET /api/v1/auth/me`。
+  - Token 口径：JWT（HS256）`access=2h`、`refresh=7d`，包含 `sub/role/username/typ/iat/exp`。
+- 安全与运行基线：
+  - 新增密码口径：`PBKDF2-SHA256`（兼容历史本地明文口径用于开发联调）。
+  - 新增配置项：`VOLTIQ_JWT_SECRET_KEY`、`VOLTIQ_JWT_ISSUER`、`VOLTIQ_JWT_ACCESS_EXPIRES_MINUTES`、`VOLTIQ_JWT_REFRESH_EXPIRES_MINUTES`、`VOLTIQ_CORS_ALLOW_ORIGINS`。
+  - `backend/app/main.py` 版本标识更新至 `0.1.0-step16`，并新增 CORS 中间件（前端跨域联调）。
+  - 新增初始化脚本：`backend/scripts/seed_step16_auth_users.py`（`operator_demo`、`sales_demo`、`manager_demo`，默认密码 `voltiq123`）。
+- 前端权限渲染基线：
+  - 已新增 `frontend/src/services/voltiq/auth.ts`，落地 token 存储与认证请求封装。
+  - 已改造 `frontend/src/app.tsx`、`frontend/src/requestErrorConfig.ts`、`frontend/src/pages/user/login/index.tsx`、`frontend/src/components/RightContent/AvatarDropdown.tsx`。
+  - 已按 `operator/sales/manager` 在 `frontend/src/access.ts` 实现菜单与操作项权限渲染。
+  - 已改造路由与占位页骨架（`/leads`、`/crm/*`、`/content/tasks`、`/kb/sessions`、`/metrics`、`/audit/logs`），用于 Step 16 角色可见性验证。
+- 测试基线：
+  - 新增 `backend/tests/test_auth_api.py`，覆盖登录成功、错误密码、禁用用户、refresh 与 `me` 鉴权。
+  - 当前环境无法执行 `pytest`（缺少 `pytest` 模块）；已执行 `python -m compileall app tests` 语法校验通过。
+- 执行边界：
+  - Step 16 已按用户指令实施完成并通过用户测试验证（2026-03-20）。
+  - Step 17 门禁已解除，可按用户指令启动线索管理页面实现。
 
 

@@ -1,11 +1,11 @@
 ﻿# 实施计划（面向 AI 开发者）
 
-版本：V1.21  
-状态：Step 1-15 已完成并通过用户验证；Step 16 未启动  
+版本：V1.23  
+状态：Step 1-16 已完成并通过用户验证  
 更新日期：2026-03-20
 
 本计划基于 `docs/memory-bank/tech-stack.md` 与 `docs/memory-bank/AI_售电_产品设计文档.md`，并吸收了产品负责人在 2026-03-18 的澄清结论。先交付基础功能，完整功能在“扩展阶段”追加。
-执行门禁（2026-03-20）：Step 15 用户验证已通过，可按计划启动 Step 16（当前未启动）。
+执行门禁（2026-03-20）：Step 16 用户验证已通过，Step 17 门禁已解除，可按指令启动。
 
 
 ## 一期范围（锁定）
@@ -191,7 +191,7 @@
 - 本地验证：
   - `python -m pytest -q tests/test_metrics_api.py` 通过（3 passed）。
   - `python -m pytest -q` 全量回归通过（56 passed）。
-- 执行状态：Step 14 已完成并通过用户测试验证（2026-03-20）；Step 15 已完成并通过用户验证；Step 16 当前未启动。
+- 执行状态：Step 14 已完成并通过用户测试验证（2026-03-20）；Step 15 已完成并通过用户验证；Step 16 已完成并通过用户验证（2026-03-20）。
 
 ### 15. 前端框架初始化（已完成，并通过用户验证）
 - 指令：使用 React + TypeScript + Ant Design Pro 初始化前端工程。
@@ -210,6 +210,17 @@
 ### 16. 登录与角色切换
 - 指令：实现账号密码登录与角色权限渲染。
 - 验证：不同角色可见菜单与可操作项不同。
+- 当前产出：
+  - 后端 `auth` 模块已落地登录/刷新/当前用户接口：`POST /api/v1/auth/login`、`POST /api/v1/auth/refresh`、`GET /api/v1/auth/me`。
+  - 已落地 JWT（access 2h、refresh 7d）与密码校验（PBKDF2-SHA256）。
+  - 前端已接入 token 登录流、401 处理、角色菜单与操作项渲染。
+  - 已补齐 Step 16 验证账号初始化脚本：`backend/scripts/seed_step16_auth_users.py`。
+- 本地验证：
+  - 后端新增 `tests/test_auth_api.py`（登录/刷新/me 用例）。
+  - 当前环境缺少 `pytest` 模块，未执行 pytest；已执行 `python -m compileall app tests` 语法校验通过。
+- 执行边界：
+  - Step 16 已按用户指令完成并通过用户测试验证（2026-03-20）。
+  - Step 17（线索管理页面）可在用户明确指令下启动。
 
 ### 17. 线索管理页面
 - 指令：实现线索列表、筛选、编辑、分配与去重结果展示。

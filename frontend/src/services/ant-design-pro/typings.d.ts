@@ -3,6 +3,10 @@
 
 declare namespace API {
   type CurrentUser = {
+    id?: string;
+    username?: string;
+    role?: 'operator' | 'sales' | 'manager';
+    status?: 'active' | 'disabled';
     name?: string;
     avatar?: string;
     userid?: string;

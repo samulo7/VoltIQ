@@ -25,6 +25,16 @@ class Settings:
     dify_request_retry_backoff_seconds: float = float(
         os.getenv("VOLTIQ_DIFY_REQUEST_RETRY_BACKOFF_SECONDS", "1")
     )
+    jwt_secret_key: str = os.getenv("VOLTIQ_JWT_SECRET_KEY", "voltiq-dev-secret-change-me")
+    jwt_issuer: str = os.getenv("VOLTIQ_JWT_ISSUER", "voltiq-backend")
+    jwt_access_token_expires_minutes: int = int(os.getenv("VOLTIQ_JWT_ACCESS_EXPIRES_MINUTES", "120"))
+    jwt_refresh_token_expires_minutes: int = int(
+        os.getenv("VOLTIQ_JWT_REFRESH_EXPIRES_MINUTES", "10080")
+    )
+    cors_allow_origins: str = os.getenv(
+        "VOLTIQ_CORS_ALLOW_ORIGINS",
+        "http://localhost:8000,http://127.0.0.1:8000",
+    )
 
     @property
     def sqlalchemy_database_uri(self) -> str:
@@ -34,6 +44,11 @@ class Settings:
             f"postgresql+psycopg://{user}:{password}"
             f"@{self.db_host}:{self.db_port}/{self.db_name}"
         )
+
+    @property
+    def cors_origins(self) -> list[str]:
+        origins = [origin.strip() for origin in self.cors_allow_origins.split(",")]
+        return [origin for origin in origins if origin]
 
 
 @lru_cache

@@ -4,6 +4,52 @@
 
 ## 2026-03-20
 
+### 已完成事项（Step 16）
+- 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
+- 已按用户指令实施计划 Step 16（登录与角色切换）：
+  - 后端 `auth` 模块完成分层落地：新增 `deps.py`、`schemas.py`、`repository.py`、`security.py`、`service.py`，并扩展 `router.py`。
+  - 已实现认证接口：`POST /api/v1/auth/login`、`POST /api/v1/auth/refresh`、`GET /api/v1/auth/me`。
+  - 已落地 JWT（HS256）口径：`access_token=2h`、`refresh_token=7d`。
+  - 已落地密码校验口径：`PBKDF2-SHA256`（兼容历史开发明文密码）。
+  - 新增 CORS 与鉴权配置项（`VOLTIQ_JWT_*`、`VOLTIQ_CORS_ALLOW_ORIGINS`），`backend/app/main.py` 版本更新至 `0.1.0-step16`。
+  - 新增账号初始化脚本：`backend/scripts/seed_step16_auth_users.py`（`operator_demo/sales_demo/manager_demo`，默认密码 `voltiq123`）。
+  - 前端已接入 VoltIQ 认证链路：`frontend/src/services/voltiq/auth.ts`、`app.tsx`、`requestErrorConfig.ts`、登录页、头像退出登录。
+  - 前端已按角色完成菜单与操作项渲染：更新 `routes.ts`、`access.ts`、`Welcome.tsx`，并新增 Step 17-22 的权限占位页骨架（仅渲染，不实现业务逻辑）。
+  - 已更新 `backend/README.md`、`frontend/README.md`、`docs/memory-bank/architecture.md`（V1.26）、`docs/memory-bank/IMPLEMENTATION_PLAN.md`（V1.23）。
+
+### 产出文件（Step 16）
+- 后端：
+  - `backend/app/modules/auth/router.py`、`backend/app/modules/auth/deps.py`、`backend/app/modules/auth/schemas.py`、`backend/app/modules/auth/repository.py`、`backend/app/modules/auth/security.py`、`backend/app/modules/auth/service.py`
+  - `backend/tests/test_auth_api.py`
+  - `backend/scripts/seed_step16_auth_users.py`
+  - `backend/app/core/config.py`、`backend/app/main.py`、`backend/.env.example`、`backend/README.md`
+- 前端：
+  - `frontend/src/services/voltiq/auth.ts`
+  - `frontend/src/app.tsx`、`frontend/src/requestErrorConfig.ts`、`frontend/src/access.ts`
+  - `frontend/src/pages/user/login/index.tsx`、`frontend/src/pages/Welcome.tsx`
+  - `frontend/src/components/RightContent/AvatarDropdown.tsx`
+  - `frontend/config/routes.ts`、`frontend/config/defaultSettings.ts`
+  - `frontend/src/pages/_components/StepPlaceholder.tsx` 与 `frontend/src/pages/leads|crm|content|kb|metrics|audit` 占位页
+  - `frontend/README.md`
+- 文档：
+  - `docs/memory-bank/architecture.md`、`docs/memory-bank/IMPLEMENTATION_PLAN.md`、`docs/memory-bank/progress.md`
+
+### 本地验证（Step 16）
+- 后端：
+  - 计划执行：`python -m pytest -q tests/test_auth_api.py`
+  - 实际结果：当前环境缺少 `pytest` 模块（`No module named pytest`），未能执行 pytest。
+  - 已执行替代校验：`python -m compileall app tests`（通过）。
+- 前端：
+  - 已执行：`pnpm -C frontend run tsc`
+  - 结果：通过（`tsc --noEmit` 成功，无 TypeScript 错误）。
+
+### 验收状态（Step 16）
+- Step 16 已完成并通过用户测试确认（确认日期：2026-03-20）。
+
+### 执行约束记录（Step 16）
+- Step 16 已按用户明确指令启动并完成实现。
+- Step 16 用户验证已通过，Step 17 门禁已解除；是否启动 Step 17 以用户指令为准。
+
 ### 已完成事项（Step 15）
 - 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
 - 已按用户指令实施计划 Step 15（前端框架初始化）：
