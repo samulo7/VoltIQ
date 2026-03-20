@@ -4,6 +4,34 @@
 
 ## 2026-03-20
 
+### 已完成事项（Step 14）
+- 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
+- 已按用户指令实施计划 Step 14（后端指标接口）：
+  - 在 `backend/app/modules/metrics/` 新增 `deps.py`、`schemas.py`、`repository.py`、`service.py`，并扩展 `router.py`，完成 Step 14 接口分层落地。
+  - 已实现 `GET /api/v1/metrics/overview`，支持 `start_date/end_date` 日期过滤与默认“今日”统计。
+  - 已落地统一指标口径：`lead_count`、`deal_count`、`effective_lead_count`、`conversion_rate`（分母为 0 返回 0）。
+  - 已落地上海时区自然日统计（`Asia/Shanghai`），并返回按日序列 `daily`。
+  - 已落地 RBAC 与作用域约束：复用 `metrics.overview`，`sales` 仅可查看本人数据，`manager` 全量可读，`operator` 拒绝访问。
+  - 已更新 `backend/app/main.py` 版本标识至 `0.1.0-step14`。
+  - 已更新 `docs/memory-bank/architecture.md` 至 V1.22，并更新 `docs/memory-bank/IMPLEMENTATION_PLAN.md` 至 V1.19。
+- 已完成本地回归：
+  - `python -m pytest -q tests/test_metrics_api.py` 通过（3 passed）。
+  - `python -m pytest -q` 全量回归通过（56 passed）。
+
+### 产出文件（Step 14）
+- `backend/app/modules/metrics/router.py`、`backend/app/modules/metrics/deps.py`、`backend/app/modules/metrics/schemas.py`、`backend/app/modules/metrics/repository.py`、`backend/app/modules/metrics/service.py`：Step 14 指标接口与分层实现。
+- `backend/tests/test_metrics_api.py`：Step 14 接口集成测试（角色权限/sales 作用域/时区边界/日期过滤/零分母/非法区间）。
+- `backend/app/main.py`：版本标识更新至 `0.1.0-step14`。
+- `docs/memory-bank/architecture.md`、`docs/memory-bank/IMPLEMENTATION_PLAN.md`：Step 14 架构基线与实施状态同步。
+
+### 验收状态（Step 14）
+- Step 14 已完成并通过用户测试确认（确认日期：2026-03-20）。
+- 用户验证结果：`python -m pytest -q tests/test_metrics_api.py` 输出 `3 passed in 1.21s`。
+
+### 执行约束记录（Step 14）
+- Step 14 已按用户明确指令启动并完成工程实现。
+- Step 14 用户验证已通过，Step 15 门禁已解除（当前未启动）。
+
 ### 已完成事项（Step 13）
 - 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
 - 已按用户指令实施计划 Step 13（智能客服基础问答接口）：
@@ -34,7 +62,7 @@
 
 ### 执行约束记录（当前）
 - Step 13 已按用户明确指令启动并完成工程实现。
-- Step 13 用户验证已通过，Step 14 门禁已解除（当前未启动）。
+- Step 13 用户验证已通过，Step 14 门禁已解除并已实施完成。
 
 ### 运行问题记录（Step 13 用户验证）
 - 现象 1：执行 `python scripts/verify_step13_kb_api.py ...` 报错 `WinError 10061`，无法连接 `127.0.0.1:8000`。

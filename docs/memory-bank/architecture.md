@@ -1,7 +1,7 @@
 ﻿# 架构文档（Architecture）
 
-版本：V1.20  
-状态：一期基线已锁定（Step 1-13 已完成并通过用户验证；Step 14 未启动；Step 12 测速能力含 TTFT 统计）  
+版本：V1.22  
+状态：一期基线已锁定（Step 1-14 已完成并通过用户验证；Step 15 未启动；Step 12 测速能力含 TTFT 统计）  
 更新日期：2026-03-20
 
 ## 1. 范围与边界
@@ -293,7 +293,8 @@
   - Step 11（内容生成任务接口）已按用户指令完成工程实现。
   - Step 12（知识库接入方案确认）已按用户指令完成工程实现，并通过用户测试验证（2026-03-19）。
   - Step 13（智能客服基础问答接口）已完成并通过用户测试验证（2026-03-20）。
-  - Step 14（后端指标接口）门禁已解除，当前未启动。
+  - Step 14（后端指标接口）已完成并通过用户测试验证（2026-03-20）。
+  - Step 15 门禁已解除，当前未启动。
 
 ## 14. Step 3 目录基线（新增）
 - `frontend/`：前端工程目录（后续步骤落地 React + TypeScript + Ant Design Pro）。
@@ -487,7 +488,33 @@
   - 本地验证：`python -m pytest -q` 全量通过（53 passed）。
   - 用户验证：`python scripts/verify_step13_kb_api.py --actor-user-id d77487b2-faed-411a-871e-0f761b045812 --actor-role operator` 通过（Q1-Q5 全部 `[PASS]`）。
 - 执行边界：
-  - Step 13 用户验证已通过，Step 14 门禁已解除（当前仍未启动）。
+  - Step 13 用户验证已通过，Step 14 门禁已解除并已实施完成。
+
+## 25. Step 14 后端指标接口基线（新增）
+- 落地目录：
+  - `backend/app/modules/metrics/`（`router.py`、`deps.py`、`schemas.py`、`repository.py`、`service.py`）。
+- 接口基线：
+  - `GET /api/v1/metrics/overview`：返回指标总览与按日序列（`daily`）。
+  - 查询参数：`start_date`、`end_date`（`YYYY-MM-DD`，按 `Asia/Shanghai` 自然日）。
+  - 参数缺省：`start_date/end_date` 同时缺省时统计“今日”；仅传一侧时按单日统计。
+- 指标口径：
+  - `lead_count`：时间窗口内新建线索数（按 `leads.created_at`）。
+  - `deal_count`：时间窗口内成单数（按 `deals.deal_date`）。
+  - `effective_lead_count`：时间窗口内 `status in (contacted, converted)` 的新建线索数。
+  - `conversion_rate`：`deal_count / effective_lead_count`；分母为 `0` 时返回 `0`。
+  - 汇总与按日序列均采用统一口径，时区固定 `Asia/Shanghai`。
+- 权限与范围：
+  - 接口授权复用 Step 6 RBAC：`metrics.overview`。
+  - `sales` 仅可查看本人数据（按 `owner_user_id` 作用域过滤）。
+  - `manager` 可查看全量数据；`operator` 默认拒绝访问。
+- 测试基线：
+  - 新增 `backend/tests/test_metrics_api.py`，覆盖角色权限、sales 作用域、上海时区跨日边界、时间过滤、零分母转化率与非法日期区间。
+  - 本地验证：`python -m pytest -q tests/test_metrics_api.py` 通过（3 passed）。
+  - 全量回归：`python -m pytest -q` 通过（56 passed）。
+- 版本基线：
+  - `backend/app/main.py` 版本标识更新至 `0.1.0-step14`。
+- 执行边界：
+  - Step 14 用户验证已通过，Step 15 门禁已解除（当前未启动）。
 
 
 

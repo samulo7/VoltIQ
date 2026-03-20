@@ -1,11 +1,11 @@
 ﻿# 实施计划（面向 AI 开发者）
 
-版本：V1.17  
-状态：Step 1-13 已完成并通过用户验证；Step 14 未启动  
+版本：V1.19  
+状态：Step 1-14 已完成并通过用户验证；Step 15 未启动  
 更新日期：2026-03-20
 
 本计划基于 `docs/memory-bank/tech-stack.md` 与 `docs/memory-bank/AI_售电_产品设计文档.md`，并吸收了产品负责人在 2026-03-18 的澄清结论。先交付基础功能，完整功能在“扩展阶段”追加。
-执行门禁（2026-03-20）：Step 13 用户验证已通过，可按计划启动 Step 14（当前未启动）。
+执行门禁（2026-03-20）：Step 14 用户验证已通过，可按计划启动 Step 15（当前未启动）。
 
 
 ## 一期范围（锁定）
@@ -181,7 +181,17 @@
 ### 14. 后端指标接口（基础）
 - 指令：提供线索数、成单数、转化率等指标接口，统一时区与口径。
 - 验证：统计结果与数据库一致，时间过滤生效。
-- 执行状态：Step 13 门禁已解除，Step 14 当前未启动。
+- 当前产出：
+  - 已在 `backend/app/modules/metrics/` 新增 `deps.py`、`schemas.py`、`repository.py`、`service.py`，并扩展 `router.py`，完成 Step 14 接口分层落地。
+  - 已实现 `GET /api/v1/metrics/overview`，支持 `start_date/end_date` 日期过滤，返回总览与按日序列统计结果。
+  - 已落地统一口径：`lead_count`、`deal_count`、`effective_lead_count`、`conversion_rate`；时区固定 `Asia/Shanghai`，零分母转化率返回 `0`。
+  - 已落地 RBAC 与作用域：复用 `metrics.overview`；`sales` 仅可查看本人数据，`manager` 可查看全量，`operator` 拒绝访问。
+  - 已新增 `backend/tests/test_metrics_api.py`，覆盖角色权限、sales 作用域、上海时区跨日边界、时间过滤、零分母与非法日期区间。
+  - 已更新 `backend/app/main.py` 版本标识至 `0.1.0-step14`。
+- 本地验证：
+  - `python -m pytest -q tests/test_metrics_api.py` 通过（3 passed）。
+  - `python -m pytest -q` 全量回归通过（56 passed）。
+- 执行状态：Step 14 已完成并通过用户测试验证（2026-03-20）；Step 15 门禁已解除，当前未启动。
 
 ### 15. 前端框架初始化
 - 指令：使用 React + TypeScript + Ant Design Pro 初始化前端工程。
