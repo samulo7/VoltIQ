@@ -1,4 +1,4 @@
-import type { RequestConfig } from '@umijs/max';
+﻿import type { RequestConfig } from '@umijs/max';
 import { history } from '@umijs/max';
 import { message } from 'antd';
 import type { RequestOptions } from '@@/plugin-request/request';
@@ -42,13 +42,22 @@ export const errorConfig: RequestConfig = {
     (config: RequestOptions) => {
       const token = authStorage.getAccessToken();
       if (!token) return config;
+
+      const currentUser = authStorage.getUser();
       return {
         ...config,
         headers: {
           ...(config.headers || {}),
           Authorization: `Bearer ${token}`,
+          ...(currentUser
+            ? {
+                'X-Actor-Role': currentUser.role,
+                'X-Actor-User-Id': currentUser.id,
+              }
+            : {}),
         },
       };
     },
   ],
 };
+

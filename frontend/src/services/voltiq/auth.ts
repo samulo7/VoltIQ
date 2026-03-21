@@ -1,4 +1,4 @@
-import { request } from '@umijs/max';
+﻿import { request } from '@umijs/max';
 
 export type UserRole = 'operator' | 'sales' | 'manager';
 
@@ -28,6 +28,7 @@ export type LoginPayload = {
 
 const ACCESS_TOKEN_KEY = 'voltiq.access_token';
 const REFRESH_TOKEN_KEY = 'voltiq.refresh_token';
+const AUTH_USER_KEY = 'voltiq.auth_user';
 
 const canUseStorage = () => typeof window !== 'undefined';
 
@@ -45,10 +46,26 @@ export const authStorage = {
     window.localStorage.setItem(ACCESS_TOKEN_KEY, tokenPair.access_token);
     window.localStorage.setItem(REFRESH_TOKEN_KEY, tokenPair.refresh_token);
   },
+  getUser: (): AuthUser | null => {
+    if (!canUseStorage()) return null;
+    const raw = window.localStorage.getItem(AUTH_USER_KEY);
+    if (!raw) return null;
+    try {
+      return JSON.parse(raw) as AuthUser;
+    } catch {
+      window.localStorage.removeItem(AUTH_USER_KEY);
+      return null;
+    }
+  },
+  setUser: (user: AuthUser) => {
+    if (!canUseStorage()) return;
+    window.localStorage.setItem(AUTH_USER_KEY, JSON.stringify(user));
+  },
   clear: () => {
     if (!canUseStorage()) return;
     window.localStorage.removeItem(ACCESS_TOKEN_KEY);
     window.localStorage.removeItem(REFRESH_TOKEN_KEY);
+    window.localStorage.removeItem(AUTH_USER_KEY);
   },
 };
 

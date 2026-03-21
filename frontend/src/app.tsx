@@ -1,4 +1,4 @@
-import { LinkOutlined } from '@ant-design/icons';
+﻿import { LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
@@ -27,7 +27,9 @@ export async function getInitialState(): Promise<{
 }> {
   const fetchUserInfo = async () => {
     try {
-      return await getCurrentUser();
+      const user = await getCurrentUser();
+      authStorage.setUser(user);
+      return user;
     } catch (_error) {
       authStorage.clear();
       return undefined;
@@ -127,6 +129,8 @@ export const request: RequestConfig = {
   baseURL:
     process.env.UMI_APP_VOLTIQ_API_BASE_URL ||
     process.env.VOLTIQ_API_BASE_URL ||
-    'http://127.0.0.1:9020/api/v1',
+    'http://127.0.0.1:9000/api/v1',
   ...errorConfig,
 };
+
+

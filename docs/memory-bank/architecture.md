@@ -1,8 +1,8 @@
-﻿# 架构文档（Architecture）
+# 架构文档（Architecture）
 
-版本：V1.26  
-状态：一期基线已锁定（Step 1-16 已完成并通过用户验证；Step 12 测速能力含 TTFT 统计）  
-更新日期：2026-03-20
+版本：V1.28  
+状态：一期基线已锁定（Step 1-17 已完成并通过用户验证；Step 12 测速能力含 TTFT 统计）  
+更新日期：2026-03-21
 
 ## 1. 范围与边界
 - 当前文档仅覆盖 MVP 一期基础功能。
@@ -543,6 +543,28 @@
   - 当前环境无法执行 `pytest`（缺少 `pytest` 模块）；已执行 `python -m compileall app tests` 语法校验通过。
 - 执行边界：
   - Step 16 已按用户指令实施完成并通过用户测试验证（2026-03-20）。
-  - Step 17 门禁已解除，可按用户指令启动线索管理页面实现。
+  - Step 17 已按用户指令实施完成并通过用户测试验证（2026-03-21）。
 
 
+
+## 28. Step 17 线索管理页面基线（已验收）
+- 落地目录：
+  - `frontend/src/pages/leads/index.tsx`。
+  - `frontend/src/services/voltiq/leads.ts`。
+- 页面能力基线：
+  - 已实现线索列表与分页，展示姓名、手机号、企业名称、来源渠道、状态、负责人 UUID、最近跟进时间与更新时间。
+  - 已实现筛选条件：`status`、`source_channel`、`keyword`、`created_at` 时间范围；`operator` 可额外按 `owner_user_id` 筛选。
+  - 已实现新增线索弹窗，支持 `operator` 可选填写 `owner_user_id`；创建命中去重时展示 `action=merged` 与 `merge_reason`。
+  - 已实现编辑线索弹窗（姓名/手机号/企业名称/来源渠道/状态）。
+  - 已实现负责人分配弹窗（UUID 手动输入）与手动合并弹窗（`merge_reason` + `merged_payload` JSON）。
+  - 已完成联调修复：前端默认 API 地址统一 `9000`，并在鉴权拦截器补齐 `X-Actor-Role`、`X-Actor-User-Id` 请求头以兼容当前线索模块鉴权依赖。
+  - 已增强手动合并反馈：顶部常驻展示最近一次手动合并结果（目标线索、原因、时间）。
+- 权限渲染基线：
+  - `operator`：可新增、编辑、分配、手动合并。
+  - `sales`：可新增、编辑（后端 owner 约束继续生效）；不可分配、不可手动合并。
+  - `manager`：只读查看。
+- 测试基线：
+  - 已执行前端类型检查：`pnpm -C frontend run tsc` 通过（2026-03-21）。
+- 执行边界：
+  - Step 17 已完成并通过用户测试验证（2026-03-21）。
+  - Step 18 门禁已解除，可按用户指令启动。

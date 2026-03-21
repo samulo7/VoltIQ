@@ -1,4 +1,4 @@
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+﻿import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { LoginForm, ProFormText } from '@ant-design/pro-components';
 import { history, useModel } from '@umijs/max';
 import { Alert, App, Space, Typography } from 'antd';
@@ -24,7 +24,9 @@ const LoginPage: React.FC = () => {
     try {
       const response = await loginByPassword(values);
       authStorage.setTokens(response);
+      authStorage.setUser(response.user);
       const currentUser = await getCurrentUser();
+      authStorage.setUser(currentUser);
       flushSync(() => {
         setInitialState((state) => ({
           ...state,
@@ -92,3 +94,5 @@ const LoginPage: React.FC = () => {
 };
 
 export default LoginPage;
+
+
