@@ -1,7 +1,7 @@
 # 架构文档（Architecture）
 
-版本：V1.29  
-状态：一期基线已锁定（Step 1-18 已完成并通过用户验证；Step 12 测速能力含 TTFT 统计）  
+版本：V1.30  
+状态：一期基线已锁定（Step 1-18 已完成并通过用户验证；Step 19 已完成工程实现待用户验证；Step 12 测速能力含 TTFT 统计）  
 更新日期：2026-03-21
 
 ## 1. 范围与边界
@@ -592,3 +592,22 @@
   - Step 18 已完成并通过用户测试验证（2026-03-21）。
   - Step 19 门禁已解除，可按用户指令启动。
 
+## 30. Step 19 内容生成页面基线（待用户验证）
+- 落地目录：
+  - frontend/src/services/voltiq/content.ts。
+  - frontend/src/pages/content/tasks/index.tsx。
+- 页面能力基线：
+  - 已替换 StepPlaceholder，占位页升级为可用页面，支持内容任务列表分页与筛选。
+  - 已支持筛选条件：task_type、status、created_by、created_at 时间范围。
+  - 已实现三类任务提交（copywriting、image、video_script），提交入口为弹窗表单（任务类型 + prompt）。
+  - 已落地前端过渡态口径：提交时显示“任务提交中”，提交成功后展示“最近一次提交完成”并刷新列表。
+  - 已实现任务结果详情区，支持查看 result_text 与 result_meta（格式化 JSON 展示）。
+- 权限渲染基线：
+  - operator：可查询、可创建任务、可查看详情。
+  - manager：只读查询与查看详情，不可创建任务。
+  - sales：保持无内容任务菜单入口（由 Step 16 权限渲染基线控制）。
+- 测试基线：
+  - 已执行前端类型检查：pnpm -C frontend run tsc（2026-03-21）。
+- 执行边界：
+  - Step 19 已按用户指令启动并完成工程实现，待用户测试验证。
+  - 在用户完成 Step 19 验证前，不启动 Step 20（智能客服页面）。

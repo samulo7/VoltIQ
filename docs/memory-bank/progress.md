@@ -3,6 +3,33 @@
 更新时间：2026-03-21
 
 ## 2026-03-21
+### 已完成事项（Step 19）
+- 已按用户指令完整阅读 docs/memory-bank/ 全部文件与 docs/memory-bank/progress.md。
+- 已按用户指令实施计划 Step 19（内容生成页面）：
+  - 新增前端服务层 frontend/src/services/voltiq/content.ts，统一封装内容任务 create/list/detail 接口与类型。
+  - 已替换 frontend/src/pages/content/tasks/index.tsx 占位页，落地内容任务真实页面。
+  - 已实现任务列表分页与筛选（task_type、status、created_by、created_at 时间范围）。
+  - 已实现三类任务提交（copywriting、image、video_script）与结果详情展示（result_text、result_meta）。
+  - 已按确认口径落地前端过渡态：提交时显示“任务提交中”，成功后刷新并展示最新状态。
+  - 已同步更新 docs/memory-bank/architecture.md（V1.30）与 docs/memory-bank/IMPLEMENTATION_PLAN.md（V1.27）。
+
+### 产出文件（Step 19）
+- frontend/src/services/voltiq/content.ts。
+- frontend/src/pages/content/tasks/index.tsx。
+- docs/memory-bank/architecture.md。
+- docs/memory-bank/IMPLEMENTATION_PLAN.md。
+- docs/memory-bank/progress.md。
+
+### 本地验证（Step 19）
+- 已执行：pnpm -C frontend run tsc。
+- 结果：通过（tsc --noEmit 成功，无 TypeScript 错误，2026-03-21）。
+
+### 验收状态（Step 19）
+- Step 19 已完成工程实现，待用户测试确认。
+
+### 执行约束记录（Step 19）
+- Step 19 已按用户明确指令启动并完成工程实现。
+- 在用户完成 Step 19 验证前，不启动 Step 20。
 
 ### 已完成事项（Step 18）
 - 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
@@ -380,15 +407,3 @@
 - Step 10 已按用户明确指令启动并完成工程实现。
 - 在用户完成 Step 10 测试验证前，不启动 Step 11（内容生成任务接口）。
 - 按分工约定，测试由用户侧执行，当前记录不包含测试执行结果。
-
-
-
-
-
-
-
-
-
-
-
-
