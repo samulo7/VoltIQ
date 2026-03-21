@@ -4,6 +4,36 @@
 
 ## 2026-03-21
 
+### 已完成事项（Step 18）
+- 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
+- 已按用户指令实施计划 Step 18（CRM 跟进与商机页面，含成单联动）：
+  - 新增前端服务层 `frontend/src/services/voltiq/crm.ts`，统一封装 `follow-ups`、`opportunities`、`deals` 接口与类型。
+  - 已改造 `frontend/src/pages/crm/follow-ups/index.tsx`，实现跟进记录列表分页、筛选（线索/客户/创建人/时间）、新增、编辑、删除。
+  - 已落地跟进新增“线索下拉选择”交互（可搜索），并兼容可选 `customer_id` 录入。
+  - 已改造 `frontend/src/pages/crm/opportunities/index.tsx`，实现商机列表分页、筛选、阶段统计、阶段流转（含 `lost_reason` 校验）与商机页内联创建成单。
+  - 已改造 `frontend/src/pages/crm/deals/index.tsx`，实现成单记录分页、按商机/日期筛选、基于谈判中商机下拉创建成单。
+  - 已同步更新 `docs/memory-bank/architecture.md`（V1.29）与 `docs/memory-bank/IMPLEMENTATION_PLAN.md`（V1.26）。
+
+### 产出文件（Step 18）
+- `frontend/src/services/voltiq/crm.ts`。
+- `frontend/src/pages/crm/follow-ups/index.tsx`。
+- `frontend/src/pages/crm/opportunities/index.tsx`。
+- `frontend/src/pages/crm/deals/index.tsx`。
+- `docs/memory-bank/architecture.md`。
+- `docs/memory-bank/IMPLEMENTATION_PLAN.md`。
+- `docs/memory-bank/progress.md`。
+
+### 本地验证（Step 18）
+- 已执行：`pnpm -C frontend run tsc`。
+- 结果：通过（`tsc --noEmit` 成功，无 TypeScript 错误，2026-03-21）。
+
+### 验收状态（Step 18）
+- Step 18 已完成并通过用户测试确认（确认日期：2026-03-21）。
+
+### 执行约束记录（Step 18）
+- Step 18 已按用户明确指令启动并完成工程实现。
+- Step 18 用户验证已通过，Step 19 门禁已解除；是否启动 Step 19 以用户指令为准。
+
 ### 已完成事项（Step 17 验收）
 - Step 17（线索管理页面）已完成用户验收（确认日期：2026-03-21）。
 - 验收过程已修复并确认：
@@ -350,6 +380,8 @@
 - Step 10 已按用户明确指令启动并完成工程实现。
 - 在用户完成 Step 10 测试验证前，不启动 Step 11（内容生成任务接口）。
 - 按分工约定，测试由用户侧执行，当前记录不包含测试执行结果。
+
+
 
 
 

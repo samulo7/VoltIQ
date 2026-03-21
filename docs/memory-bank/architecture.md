@@ -1,7 +1,7 @@
 # 架构文档（Architecture）
 
-版本：V1.28  
-状态：一期基线已锁定（Step 1-17 已完成并通过用户验证；Step 12 测速能力含 TTFT 统计）  
+版本：V1.29  
+状态：一期基线已锁定（Step 1-18 已完成并通过用户验证；Step 12 测速能力含 TTFT 统计）  
 更新日期：2026-03-21
 
 ## 1. 范围与边界
@@ -568,3 +568,27 @@
 - 执行边界：
   - Step 17 已完成并通过用户测试验证（2026-03-21）。
   - Step 18 门禁已解除，可按用户指令启动。
+
+## 29. Step 18 CRM 跟进与商机页面基线（已验收）
+- 落地目录：
+  - `frontend/src/services/voltiq/crm.ts`。
+  - `frontend/src/pages/crm/follow-ups/index.tsx`。
+  - `frontend/src/pages/crm/opportunities/index.tsx`。
+  - `frontend/src/pages/crm/deals/index.tsx`。
+- 页面能力基线：
+  - 跟进记录页已实现列表分页、按线索/客户/创建人/时间筛选，支持新增、编辑、删除与实时刷新。
+  - 跟进新增表单已接入线索下拉选择（可搜索），并兼容可选 `customer_id` 录入。
+  - 商机管理页已实现列表分页、按线索/客户/阶段/时间筛选、阶段分布与成单统计展示。
+  - 商机阶段流转已落地：`initial -> proposal -> negotiation -> lost`，其中 `lost` 强制填写丢单原因。
+  - 已在商机页落地“创建成单”联动入口：仅 `negotiation` 阶段可创建，创建后由后端自动置 `won`。
+  - 成单记录页已实现列表分页、按商机/日期筛选，并支持基于谈判中商机下拉创建成单。
+- 权限渲染基线：
+  - `sales`：可新增/编辑/删除跟进、推进商机阶段、创建成单。
+  - `manager`：只读查询跟进/商机/成单。
+  - `operator`：保持无 CRM 菜单入口（由 Step 16 权限渲染基线控制）。
+- 测试基线：
+  - 已执行前端类型检查：`pnpm -C frontend run tsc` 通过（2026-03-21）。
+- 执行边界：
+  - Step 18 已完成并通过用户测试验证（2026-03-21）。
+  - Step 19 门禁已解除，可按用户指令启动。
+
