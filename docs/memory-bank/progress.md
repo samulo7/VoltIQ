@@ -1,8 +1,43 @@
 # 开发进度记录（Progress）
 
-更新时间：2026-03-21
+更新时间：2026-03-22
+
+## 2026-03-22
+### 会话继承需求（长期约束）
+- 当前项目仍处于 V1 版本实施阶段，整体进度为 in process。
+- `frontend_productization_execution_plan_v1.md` 仅做计划沉淀与约束固化，不作为当前阶段主执行线。
+- 前端产品化改造（dashboard/workbench 聚合、运营型客服台、管理层审批/校正入口、内容任务状态模型升级等）统一在 V1 阶段完成并验收后启动。
+- 后续新会话默认先读取 `docs/memory-bank/IMPLEMENTATION_PLAN.md` 与本文件，再决定是否进入产品化改造执行。
 
 ## 2026-03-21
+### 已完成事项（Step 20）
+- 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
+- 已按用户指令实施计划 Step 20（智能客服页面）：
+  - 新增前端服务层 `frontend/src/services/voltiq/kb.ts`，统一封装会话列表与问答接口（`listKbSessions`/`chatWithKb`）及类型。
+  - 已替换 `frontend/src/pages/kb/sessions/index.tsx` 占位页，落地智能客服可用页面。
+  - 已实现会话列表分页、刷新、会话切换与“新会话”入口。
+  - 已实现问答对话框：首次提问自动建会话，后续提问自动携带 `session_key` 进行连续对话。
+  - 已实现回答依据展示：assistant 消息展示 `sources`（知识库、文档、评分、片段内容）。
+  - 已同步更新 `docs/memory-bank/architecture.md`（V1.31）与 `docs/memory-bank/IMPLEMENTATION_PLAN.md`（V1.28）。
+
+### 产出文件（Step 20）
+- `frontend/src/services/voltiq/kb.ts`。
+- `frontend/src/pages/kb/sessions/index.tsx`。
+- `docs/memory-bank/architecture.md`。
+- `docs/memory-bank/IMPLEMENTATION_PLAN.md`。
+- `docs/memory-bank/progress.md`。
+
+### 本地验证（Step 20）
+- 已执行：`pnpm -C frontend run tsc`。
+- 结果：通过（`tsc --noEmit` 成功，无 TypeScript 错误，2026-03-21）。
+
+### 验收状态（Step 20）
+- Step 20 已完成工程实现，待用户测试确认。
+
+### 执行约束记录（Step 20）
+- Step 20 已按用户明确指令启动并完成工程实现。
+- 在用户完成 Step 20 验证前，不启动 Step 21。
+
 ### 已完成事项（Step 19）
 - 已按用户指令完整阅读 docs/memory-bank/ 全部文件与 docs/memory-bank/progress.md。
 - 已按用户指令实施计划 Step 19（内容生成页面）：
@@ -29,7 +64,7 @@
 
 ### 执行约束记录（Step 19）
 - Step 19 已按用户明确指令启动并完成工程实现。
-- 在用户完成 Step 19 验证前，不启动 Step 20。
+- Step 20 已按用户明确指令启动并完成工程实现，待用户测试确认。
 
 ### 已完成事项（Step 18）
 - 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。

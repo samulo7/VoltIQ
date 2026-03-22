@@ -46,6 +46,8 @@
 
 ## Agent 使用说明
 编辑文档时请保持原有结构与语气，若修改需求请同步更新版本/日期字段，并确保内容范围与 `docs/memory-bank/AI_售电_产品设计文档.md` 一致。
+- 当前主线为 V1（in process）；`docs/memory-bank/frontend_productization_execution_plan_v1.md` 仅在 V1 全量验收后启动执行。
+- 新会话默认先读取 `docs/memory-bank/IMPLEMENTATION_PLAN.md` 与 `docs/memory-bank/progress.md`，再判断是否进入产品化改造执行。
 
 ## AI 开发规则（强制）
 以下规则面向 AI 开发者，必须严格遵守。
