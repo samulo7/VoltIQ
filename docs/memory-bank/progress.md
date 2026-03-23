@@ -1,6 +1,36 @@
 # 开发进度记录（Progress）
 
-更新时间：2026-03-22
+更新时间：2026-03-23
+
+## 2026-03-23
+### 已完成事项（Step 21）
+- 已按用户指令完整阅读 `docs/memory-bank/` 全部文件与 `docs/memory-bank/progress.md`。
+- 已按用户指令实施计划 Step 21（基础数据看板）：
+  - 新增前端服务层 `frontend/src/services/voltiq/metrics.ts`，统一封装 `GET /api/v1/metrics/overview` 接口与类型。
+  - 已替换 `frontend/src/pages/metrics/index.tsx` 占位页，落地基础数据看板可用页面。
+  - 已实现筛选区（日期范围、重置为今日、刷新）并对接后端 `start_date/end_date` 参数。
+  - 已实现指标卡展示：新增线索、有效线索、成单数、转化率。
+  - 已实现按日明细表展示：`date`、`lead_count`、`effective_lead_count`、`deal_count`、`conversion_rate`。
+  - 已补齐状态体验：加载、错误、空数据、正常态，并提供重试入口。
+  - 已同步更新 `docs/memory-bank/architecture.md`（V1.32）与 `docs/memory-bank/IMPLEMENTATION_PLAN.md`（V1.30）。
+
+### 产出文件（Step 21）
+- `frontend/src/services/voltiq/metrics.ts`。
+- `frontend/src/pages/metrics/index.tsx`。
+- `docs/memory-bank/architecture.md`。
+- `docs/memory-bank/IMPLEMENTATION_PLAN.md`。
+- `docs/memory-bank/progress.md`。
+
+### 本地验证（Step 21）
+- 已执行：`pnpm -C frontend run tsc`。
+- 结果：通过（`tsc --noEmit` 成功，无 TypeScript 错误，2026-03-23）。
+
+### 验收状态（Step 21）
+- Step 21 已完成并通过用户测试确认（确认日期：2026-03-23）。
+
+### 执行约束记录（Step 21）
+- Step 21 已按用户明确指令启动并完成工程实现。
+- Step 21 用户验证已通过，Step 22 门禁已解除；是否启动 Step 22 以用户指令为准。
 
 ## 2026-03-22
 ### 会话继承需求（长期约束）
