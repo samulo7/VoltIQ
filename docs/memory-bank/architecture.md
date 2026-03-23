@@ -1,7 +1,7 @@
 # 架构文档（Architecture）
 
-版本：V1.30  
-状态：一期基线已锁定（Step 1-18 已完成并通过用户验证；Step 19 已完成工程实现待用户验证；Step 12 测速能力含 TTFT 统计）  
+版本：V1.31  
+状态：一期基线已锁定（Step 1-18 已完成并通过用户验证；Step 19-20 已完成工程实现待用户验证；Step 12 测速能力含 TTFT 统计）  
 更新日期：2026-03-21
 
 ## 1. 范围与边界
@@ -594,8 +594,8 @@
 
 ## 30. Step 19 内容生成页面基线（待用户验证）
 - 落地目录：
-  - frontend/src/services/voltiq/content.ts。
-  - frontend/src/pages/content/tasks/index.tsx。
+  - `frontend/src/services/voltiq/content.ts`。
+  - `frontend/src/pages/content/tasks/index.tsx`。
 - 页面能力基线：
   - 已替换 StepPlaceholder，占位页升级为可用页面，支持内容任务列表分页与筛选。
   - 已支持筛选条件：task_type、status、created_by、created_at 时间范围。
@@ -607,7 +607,28 @@
   - manager：只读查询与查看详情，不可创建任务。
   - sales：保持无内容任务菜单入口（由 Step 16 权限渲染基线控制）。
 - 测试基线：
-  - 已执行前端类型检查：pnpm -C frontend run tsc（2026-03-21）。
+  - 已执行前端类型检查：`pnpm -C frontend run tsc`（2026-03-21）。
 - 执行边界：
   - Step 19 已按用户指令启动并完成工程实现，待用户测试验证。
-  - 在用户完成 Step 19 验证前，不启动 Step 20（智能客服页面）。
+  - Step 20 已按用户指令启动并完成工程实现，待用户测试验证。
+
+## 31. Step 20 智能客服页面基线（待用户验证）
+- 落地目录：
+  - `frontend/src/services/voltiq/kb.ts`。
+  - `frontend/src/pages/kb/sessions/index.tsx`。
+- 页面能力基线：
+  - 已替换 StepPlaceholder，占位页升级为可用页面，支持“会话列表 + 对话框”双栏交互。
+  - 已接入 `GET /api/v1/kb/sessions`，支持会话分页查询、刷新与当前会话切换。
+  - 已接入 `POST /api/v1/kb/sessions/chat`，支持首次提问自动建会话、后续提问带 `session_key` 连续对话。
+  - 已实现问答消息区与依据展示：assistant 消息展示 `sources`（知识库/文档/评分/片段内容）。
+  - 已实现新会话入口与发送过渡态：支持“新会话”后首次提问自动生成会话键；发送期间禁用输入并显示按钮 loading。
+  - 已补充页面提示：当前后端未提供历史消息查询，切换历史会话后从本页会话继续提问。
+- 权限渲染基线：
+  - operator：可查看会话、可连续提问、可查看回答依据。
+  - manager：可查看会话、可连续提问、可查看回答依据。
+  - sales：保持无智能客服菜单入口（由 Step 16 权限渲染基线控制）。
+- 测试基线：
+  - 已执行前端类型检查：`pnpm -C frontend run tsc`（2026-03-21）。
+- 执行边界：
+  - Step 20 已按用户指令启动并完成工程实现，待用户测试验证。
+  - 在用户完成 Step 20 验证前，不启动 Step 21（基础数据看板）。
